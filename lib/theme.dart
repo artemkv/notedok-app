@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 // Review the color
-const MaterialColor crayolaBlue =
+const MaterialColor royalAzul =
     MaterialColor(_appColorPrimaryValue, <int, Color>{
       50: Color.fromRGBO(45, 137, 239, .1),
       100: Color.fromRGBO(45, 137, 239, .2),
@@ -17,4 +17,4 @@ const MaterialColor crayolaBlue =
     });
 const int _appColorPrimaryValue = 0xFF003DA3;
 
-const themeColor = crayolaBlue;
+const themeColor = royalAzul;
