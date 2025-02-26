@@ -15,5 +15,9 @@ class ModelAndCommand {
 // reduce must be a pure function!
 
 ModelAndCommand reduce(Model model, Message message) {
+  /*if (message is AppInitializedNotSignedIn) {
+    return ModelAndCommand.justModel(UserNotSignedInModel());
+  }*/
+
   return ModelAndCommand.justModel(model);
 }

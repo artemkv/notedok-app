@@ -8,9 +8,9 @@ abstract class Model {
   const Model();
 
   static Model getInitialModel() {
-    return ApplicationNotInitializedModel();
+    return UserSignedInModel();
   }
 }
 
 @immutable
-class ApplicationNotInitializedModel extends Model {}
+class UserSignedInModel extends Model {}

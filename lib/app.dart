@@ -1,3 +1,4 @@
+import 'package:amplify_authenticator/amplify_authenticator.dart';
 import 'package:flutter/material.dart';
 import 'package:notedok/commands.dart';
 import 'package:notedok/messages.dart';
@@ -10,7 +11,12 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(title: 'NotedOK', home: RootWidget());
+    return Authenticator(
+      child: MaterialApp(
+        builder: Authenticator.builder(),
+        home: const RootWidget(),
+      ),
+    );
   }
 }
 
