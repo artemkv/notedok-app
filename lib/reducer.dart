@@ -16,7 +16,7 @@ class ModelAndCommand {
 
 ModelAndCommand reduce(Model model, Message message) {
   if (message is RetrieveFileListSuccess) {
-    return ModelAndCommand.justModel(FileListRetrievedModel(message.files));
+    return ModelAndCommand.justModel(NoteListViewModel(message.files));
   }
   if (message is SignOutRequested) {
     return ModelAndCommand(SignOutInProgressModel(), SignOut());

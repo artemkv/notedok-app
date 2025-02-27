@@ -43,7 +43,7 @@ class RetrieveFileList implements Command {
       var files = getFilesResponse.files.map((f) => f.fileName).toList();
 
       // TODO: handle errors
-      // dispatch(RetrieveFileListSuccess(files));
+      dispatch(RetrieveFileListSuccess(files));
     }
   }
 }

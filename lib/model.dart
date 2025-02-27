@@ -16,10 +16,10 @@ abstract class Model {
 class RetrievingFileListModel extends Model {}
 
 @immutable
-class FileListRetrievedModel extends Model {
+class NoteListViewModel extends Model {
   final List<String> files;
 
-  const FileListRetrievedModel(this.files);
+  const NoteListViewModel(this.files);
 }
 
 @immutable

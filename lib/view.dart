@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:notedok/custom_components.dart';
 import 'package:notedok/messages.dart';
 import 'package:notedok/model.dart';
@@ -16,8 +17,8 @@ Widget home(
   if (model is RetrievingFileListModel) {
     return retrievingFileList(context, model, dispatch);
   }
-  if (model is FileListRetrievedModel) {
-    return fileListRetrieved(model, dispatch);
+  if (model is NoteListViewModel) {
+    return noteListView(context, model, dispatch);
   }
   if (model is SignOutInProgressModel) {
     return signOutInProgress();
@@ -44,7 +45,21 @@ Widget retrievingFileList(
   void Function(Message) dispatch,
 ) {
   return Scaffold(
-    appBar: SearchableAppBar(),
+    // TODO: should I be able to search while retrieving the list of notes?
+    appBar: AppBar(
+      title: Text(
+        'NotedOK',
+        style: GoogleFonts.openSans(
+          textStyle: TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      foregroundColor: Colors.white,
+    ),
     drawer: drawer(context, dispatch),
     body: Center(child: Expanded(child: spinner())),
     backgroundColor: Colors.white,
@@ -101,10 +116,15 @@ Widget drawer(BuildContext context, void Function(Message) dispatch) {
   );
 }
 
-Widget fileListRetrieved(
-  FileListRetrievedModel model,
+Widget noteListView(
+  BuildContext context,
+  NoteListViewModel model,
   void Function(Message) dispatch,
 ) {
-  // TODO: See DailyWinView
-  return Text(model.files.toString());
+  return Scaffold(
+    appBar: SearchableAppBar(),
+    drawer: drawer(context, dispatch),
+    body: NoteListView(key: UniqueKey(), model: model, dispatch: dispatch),
+    backgroundColor: Colors.white,
+  );
 }
