@@ -42,7 +42,17 @@ class RetrieveFileList implements Command {
       // TODO: sort
       var files = getFilesResponse.files.map((f) => f.fileName).toList();
 
-      dispatch(RetrieveFileListSuccess(files));
+      // TODO: handle errors
+      // dispatch(RetrieveFileListSuccess(files));
     }
+  }
+}
+
+@immutable
+class SignOut implements Command {
+  @override
+  void execute(void Function(Message) dispatch) async {
+    killSession();
+    await Amplify.Auth.signOut();
   }
 }

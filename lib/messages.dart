@@ -11,3 +11,6 @@ class RetrieveFileListSuccess implements Message {
 
   const RetrieveFileListSuccess(this.files);
 }
+
+@immutable
+class SignOutRequested implements Message {}

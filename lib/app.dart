@@ -4,6 +4,7 @@ import 'package:notedok/commands.dart';
 import 'package:notedok/messages.dart';
 import 'package:notedok/model.dart';
 import 'package:notedok/reducer.dart';
+import 'package:notedok/theme.dart';
 import 'package:notedok/view.dart';
 
 class MainApp extends StatelessWidget {
@@ -14,6 +15,11 @@ class MainApp extends StatelessWidget {
     return Authenticator(
       child: MaterialApp(
         builder: Authenticator.builder(),
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: blue,
+          ).copyWith(primary: blue),
+        ),
         home: const RootWidget(),
       ),
     );

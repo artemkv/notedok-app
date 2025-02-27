@@ -21,3 +21,6 @@ class FileListRetrievedModel extends Model {
 
   const FileListRetrievedModel(this.files);
 }
+
+@immutable
+class SignOutInProgressModel extends Model {}
