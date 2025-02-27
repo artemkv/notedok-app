@@ -1,5 +1,5 @@
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
+import 'package:notedok/custom_components.dart';
 import 'package:notedok/messages.dart';
 import 'package:notedok/model.dart';
 import 'package:notedok/theme.dart';
@@ -44,20 +44,7 @@ Widget retrievingFileList(
   void Function(Message) dispatch,
 ) {
   return Scaffold(
-    appBar: AppBar(
-      title: Text(
-        'NotedOK',
-        style: GoogleFonts.openSans(
-          textStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ),
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      foregroundColor: Colors.white,
-    ),
+    appBar: SearchableAppBar(),
     drawer: drawer(context, dispatch),
     body: Center(child: Expanded(child: spinner())),
     backgroundColor: Colors.white,
@@ -118,5 +105,6 @@ Widget fileListRetrieved(
   FileListRetrievedModel model,
   void Function(Message) dispatch,
 ) {
+  // TODO: See DailyWinView
   return Text(model.files.toString());
 }
