@@ -56,3 +56,9 @@ class SignOut implements Command {
     await Amplify.Auth.signOut();
   }
 }
+
+@immutable
+class LoadNoteContent implements Command {
+  @override
+  void execute(void Function(Message) dispatch) async {}
+}

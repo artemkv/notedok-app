@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:notedok/messages.dart';
 import 'package:notedok/model.dart';
+import 'package:notedok/view.dart';
 
 class SearchableAppBar extends StatefulWidget implements PreferredSizeWidget {
   const SearchableAppBar({super.key});
@@ -142,7 +143,7 @@ class _NoteListViewState extends State<NoteListView> {
       scrollDirection: Axis.horizontal,
       controller: _controller,
       itemBuilder: (context, index) {
-        return Text(widget.model.files[index]);
+        return noteView(widget.model.files[index]);
       },
     );
   }

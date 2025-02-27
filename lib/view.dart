@@ -7,6 +7,7 @@ import 'package:notedok/theme.dart';
 
 // These should be all stateless! No side effects allowed!
 
+const textPadding = 12.0;
 const textFontSize = 16.0;
 
 Widget home(
@@ -126,5 +127,57 @@ Widget noteListView(
     drawer: drawer(context, dispatch),
     body: NoteListView(key: UniqueKey(), model: model, dispatch: dispatch),
     backgroundColor: Colors.white,
+  );
+}
+
+Widget noteView(String fileName) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Center(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 16.0, bottom: 12.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: textPadding / 2),
+                child: Text(
+                  fileName,
+                  style: GoogleFonts.openSans(
+                    textStyle: const TextStyle(fontSize: textFontSize),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      Expanded(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(textPadding * 1.6),
+                      child: Text(
+                        """Here should be the note text""",
+                        style: GoogleFonts.openSans(
+                          textStyle: const TextStyle(
+                            fontSize: textFontSize * 1.4,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    ],
   );
 }
