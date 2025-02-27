@@ -9,8 +9,11 @@ Widget home(
   Model model,
   void Function(Message) dispatch,
 ) {
-  if (model is UserSignedInModel) {
-    return userSignedIn(model, dispatch);
+  if (model is RetrievingFileListModel) {
+    return retrievingFileList(model, dispatch);
+  }
+  if (model is FileListRetrievedModel) {
+    return fileListRetrieved(model, dispatch);
   }
 
   return unknownModel(model);
@@ -20,6 +23,16 @@ Widget unknownModel(Model model) {
   return Text("Unknown model: ${model.runtimeType}");
 }
 
-Widget userSignedIn(UserSignedInModel model, void Function(Message) dispatch) {
-  return Text("Signed in");
+Widget retrievingFileList(
+  RetrievingFileListModel model,
+  void Function(Message) dispatch,
+) {
+  return Text("retrieving...");
+}
+
+Widget fileListRetrieved(
+  FileListRetrievedModel model,
+  void Function(Message) dispatch,
+) {
+  return Text(model.files.toString());
 }

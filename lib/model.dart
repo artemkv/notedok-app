@@ -8,9 +8,16 @@ abstract class Model {
   const Model();
 
   static Model getInitialModel() {
-    return UserSignedInModel();
+    return RetrievingFileListModel();
   }
 }
 
 @immutable
-class UserSignedInModel extends Model {}
+class RetrievingFileListModel extends Model {}
+
+@immutable
+class FileListRetrievedModel extends Model {
+  final List<String> files;
+
+  const FileListRetrievedModel(this.files);
+}
