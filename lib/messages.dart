@@ -1,9 +1,13 @@
 // Should all be immutable classes and no logic!
 
 import 'package:flutter/material.dart';
+import 'package:notedok/domain.dart';
 
 @immutable
 abstract class Message {}
+
+@immutable
+class SignOutRequested implements Message {}
 
 @immutable
 class RetrieveFileListSuccess implements Message {
@@ -12,8 +16,11 @@ class RetrieveFileListSuccess implements Message {
   const RetrieveFileListSuccess(this.files);
 }
 
-@immutable
-class SignOutRequested implements Message {}
+class FirstBatchOfNotesLoaded implements Message {
+  final List<Note> notes;
+
+  const FirstBatchOfNotesLoaded(this.notes);
+}
 
 @immutable
 class MovedToNote implements Message {

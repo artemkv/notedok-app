@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:notedok/custom_components.dart';
+import 'package:notedok/domain.dart';
 import 'package:notedok/messages.dart';
 import 'package:notedok/model.dart';
 import 'package:notedok/theme.dart';
@@ -19,7 +20,7 @@ Widget home(
   if (model is RetrievingFileListModel) {
     return retrievingFileList(context, model, dispatch);
   }
-  if (model is NoteListViewModel) {
+  if (model is NoteListModel) {
     return noteListView(context, model, dispatch);
   }
   if (model is NotePageViewModel) {
@@ -126,7 +127,7 @@ Widget drawer(BuildContext context, void Function(Message) dispatch) {
 
 Widget noteListView(
   BuildContext context,
-  NoteListViewModel model,
+  NoteListModel model,
   void Function(Message) dispatch,
 ) {
   return Scaffold(
@@ -137,9 +138,9 @@ Widget noteListView(
   );
 }
 
-Widget noteListItem(String title, String text) {
+Widget noteListItem(Note note) {
   return SizedBox(
-    height: 150,
+    height: 160,
     child: Column(
       children: [
         Padding(
@@ -147,7 +148,7 @@ Widget noteListItem(String title, String text) {
           child: Align(
             alignment: Alignment.topLeft,
             child: Text(
-              title,
+              note.title,
               style: GoogleFonts.openSans(
                 fontSize: textFontSize,
                 fontWeight: FontWeight.w600,
@@ -159,7 +160,7 @@ Widget noteListItem(String title, String text) {
           // TODO: can this show links? Should it?
           child: Padding(
             padding: EdgeInsets.only(top: 4, bottom: 16, left: 16, right: 16),
-            child: Text(text),
+            child: Text(note.text),
           ),
         ),
       ],

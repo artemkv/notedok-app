@@ -35,4 +35,15 @@ class Note {
   final String text;
 
   const Note(this.fileName, this.title, this.text);
+
+  @override
+  bool operator ==(Object other) {
+    return other is Note &&
+        fileName == other.fileName &&
+        title == other.title &&
+        text == other.text;
+  }
+
+  @override
+  int get hashCode => Object.hash(fileName, title, text);
 }

@@ -20,10 +20,30 @@ class SignOutInProgressModel extends Model {}
 class RetrievingFileListModel extends Model {}
 
 @immutable
-class NoteListViewModel extends Model {
-  final List<String> files;
+class NoteListModel extends Model {
+  final List<NoteListItem> items;
 
-  const NoteListViewModel(this.files);
+  const NoteListModel(this.items);
+}
+
+@immutable
+class NoteListItem {
+  const NoteListItem();
+}
+
+@immutable
+class NoteListItemNote extends NoteListItem {
+  final Note note;
+
+  const NoteListItemNote(this.note);
+
+  @override
+  bool operator ==(Object other) {
+    return other is NoteListItemNote && note == other.note;
+  }
+
+  @override
+  int get hashCode => note.hashCode;
 }
 
 @immutable

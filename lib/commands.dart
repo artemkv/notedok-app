@@ -26,6 +26,15 @@ class None implements Command {
   void execute(void Function(Message) dispatch) {}
 }
 
+@immutable
+class SignOut implements Command {
+  @override
+  void execute(void Function(Message) dispatch) async {
+    killSession();
+    await Amplify.Auth.signOut();
+  }
+}
+
 // TODO: consider sign-in explicitly the first time
 @immutable
 class RetrieveFileList implements Command {
@@ -49,11 +58,36 @@ class RetrieveFileList implements Command {
 }
 
 @immutable
-class SignOut implements Command {
+class LoadFirstBatchOfNotes implements Command {
+  final List<String> files;
+
+  const LoadFirstBatchOfNotes(this.files);
+
   @override
   void execute(void Function(Message) dispatch) async {
-    killSession();
-    await Amplify.Auth.signOut();
+    final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+    if (session.isSignedIn) {
+      var idToken = session.userPoolTokensResult.value.idToken;
+
+      List<Note> notes = [];
+      try {
+        // TODO: load in parallel with max concurrency of 6
+        for (var i = 0; i < files.length; i++) {
+          String fileName = files[i];
+          var text = await getFile(fileName, () => Future.value(idToken.raw));
+          var note = Note(
+            fileName,
+            fileName,
+            text,
+          ); // TODO: convert filename to title
+          notes.add(note);
+        }
+        dispatch(FirstBatchOfNotesLoaded(notes));
+      } catch (err) {
+        // TODO: dispatch error
+        safePrint(err);
+      }
+    }
   }
 }
 

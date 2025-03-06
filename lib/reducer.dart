@@ -15,12 +15,22 @@ class ModelAndCommand {
 
 // reduce must be a pure function!
 
+const int noteBatchSize = 5;
+
 ModelAndCommand reduce(Model model, Message message) {
   if (message is SignOutRequested) {
     return ModelAndCommand(SignOutInProgressModel(), SignOut());
   }
   if (message is RetrieveFileListSuccess) {
-    return ModelAndCommand.justModel(NoteListViewModel(message.files));
+    return ModelAndCommand(
+      model,
+      LoadFirstBatchOfNotes(message.files.take(noteBatchSize).toList()),
+    );
+  }
+  if (message is FirstBatchOfNotesLoaded) {
+    var listItems =
+        message.notes.map((note) => NoteListItemNote(note)).toList();
+    return ModelAndCommand.justModel(NoteListModel(listItems));
   }
   if (message is MovedToNote) {
     if (model is NotePageViewModel) {

@@ -118,7 +118,7 @@ class _SearchableAppBarState extends State<SearchableAppBar> {
 }
 
 class NoteList extends StatefulWidget {
-  final NoteListViewModel model;
+  final NoteListModel model;
   final void Function(Message) dispatch;
 
   const NoteList({super.key, required this.model, required this.dispatch});
@@ -134,7 +134,7 @@ class _NoteListState extends State<NoteList> {
   Widget build(BuildContext context) {
     return ScrollablePositionedList.separated(
       itemScrollController: _controller,
-      itemCount: widget.model.files.length,
+      itemCount: widget.model.items.length,
       separatorBuilder: (BuildContext context, int index) {
         return const Divider(
           height: 12,
@@ -144,9 +144,12 @@ class _NoteListState extends State<NoteList> {
         );
       },
       itemBuilder: (BuildContext context, int index) {
-        // TODO: this is not title
-        // TODO: pass the text
-        return noteListItem(widget.model.files[index], "TODO");
+        var item = widget.model.items[index];
+        if (item is NoteListItemNote) {
+          return noteListItem(item.note);
+        }
+
+        throw "Unknown type of NoteListItem";
       },
     );
   }
