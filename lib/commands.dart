@@ -37,7 +37,7 @@ class RetrieveFileList implements Command {
 
       // TODO: loop until retrieved all batches
       // TODO: make batch size 1000
-      var json = await getFiles(10, "", () => Future.value(idToken.raw));
+      var json = await getFiles(100, "", () => Future.value(idToken.raw));
       var getFilesResponse = GetFilesResponse.fromJson(json);
       // TODO: sort
       var files = getFilesResponse.files.map((f) => f.fileName).toList();

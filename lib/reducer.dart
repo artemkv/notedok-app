@@ -20,13 +20,10 @@ ModelAndCommand reduce(Model model, Message message) {
     return ModelAndCommand(SignOutInProgressModel(), SignOut());
   }
   if (message is RetrieveFileListSuccess) {
-    return ModelAndCommand(
-      NoteLoadingModel(message.files, 0),
-      LoadNoteContent(message.files[0]),
-    );
+    return ModelAndCommand.justModel(NoteListViewModel(message.files));
   }
   if (message is MovedToNote) {
-    if (model is NoteListViewModel) {
+    if (model is NotePageViewModel) {
       return ModelAndCommand(
         NoteLoadingModel(model.files, message.noteIdx),
         LoadNoteContent(model.files[message.noteIdx]),
@@ -37,7 +34,7 @@ ModelAndCommand reduce(Model model, Message message) {
     if (model is NoteLoadingModel) {
       if (model.files[model.currentFileIdx] == message.fileName) {
         return ModelAndCommand.justModel(
-          NoteListViewModel(
+          NotePageViewModel(
             model.files,
             model.currentFileIdx,
             Note(

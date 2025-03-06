@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:notedok/messages.dart';
 import 'package:notedok/model.dart';
 import 'package:notedok/view.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class SearchableAppBar extends StatefulWidget implements PreferredSizeWidget {
   const SearchableAppBar({super.key});
@@ -116,17 +117,52 @@ class _SearchableAppBarState extends State<SearchableAppBar> {
   }
 }
 
-class NoteListView extends StatefulWidget {
+class NoteList extends StatefulWidget {
   final NoteListViewModel model;
   final void Function(Message) dispatch;
 
-  const NoteListView({super.key, required this.model, required this.dispatch});
+  const NoteList({super.key, required this.model, required this.dispatch});
 
   @override
-  State<NoteListView> createState() => _NoteListViewState();
+  State<NoteList> createState() => _NoteListState();
 }
 
-class _NoteListViewState extends State<NoteListView> {
+class _NoteListState extends State<NoteList> {
+  final ItemScrollController _controller = ItemScrollController();
+
+  @override
+  Widget build(BuildContext context) {
+    return ScrollablePositionedList.separated(
+      itemScrollController: _controller,
+      itemCount: widget.model.files.length,
+      separatorBuilder: (BuildContext context, int index) {
+        return const Divider(
+          height: 12,
+          thickness: 1,
+          indent: 72,
+          endIndent: 72,
+        );
+      },
+      itemBuilder: (BuildContext context, int index) {
+        // TODO: this is not title
+        // TODO: pass the text
+        return noteListItem(widget.model.files[index], "TODO");
+      },
+    );
+  }
+}
+
+class NotePageView extends StatefulWidget {
+  final NotePageViewModel model;
+  final void Function(Message) dispatch;
+
+  const NotePageView({super.key, required this.model, required this.dispatch});
+
+  @override
+  State<NotePageView> createState() => _NotePageViewState();
+}
+
+class _NotePageViewState extends State<NotePageView> {
   late PageController _controller;
 
   @override

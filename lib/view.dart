@@ -22,6 +22,9 @@ Widget home(
   if (model is NoteListViewModel) {
     return noteListView(context, model, dispatch);
   }
+  if (model is NotePageViewModel) {
+    return notePageView(context, model, dispatch);
+  }
   if (model is SignOutInProgressModel) {
     return signOutInProgress();
   }
@@ -129,11 +132,54 @@ Widget noteListView(
   return Scaffold(
     appBar: SearchableAppBar(),
     drawer: drawer(context, dispatch),
+    body: NoteList(model: model, dispatch: dispatch),
+    backgroundColor: Colors.white,
+  );
+}
+
+Widget noteListItem(String title, String text) {
+  return SizedBox(
+    height: 150,
+    child: Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.only(top: 16, bottom: 16, left: 16, right: 16),
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: Text(
+              title,
+              style: GoogleFonts.openSans(
+                fontSize: textFontSize,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          // TODO: can this show links? Should it?
+          child: Padding(
+            padding: EdgeInsets.only(top: 4, bottom: 16, left: 16, right: 16),
+            child: Text(text),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget notePageView(
+  BuildContext context,
+  NotePageViewModel model,
+  void Function(Message) dispatch,
+) {
+  return Scaffold(
+    appBar: SearchableAppBar(),
+    drawer: drawer(context, dispatch),
     body: Column(
       children: [
         noteHeader(context, model.currentFileIdx, model.files.length),
         Expanded(
-          child: NoteListView(
+          child: NotePageView(
             key: UniqueKey(),
             model: model,
             dispatch: dispatch,
@@ -146,7 +192,7 @@ Widget noteListView(
 }
 
 class NoteView extends StatelessWidget {
-  final NoteListViewModel model;
+  final NotePageViewModel model;
   final int pageIdx;
 
   const NoteView({super.key, required this.model, required this.pageIdx});

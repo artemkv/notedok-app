@@ -22,10 +22,17 @@ class RetrievingFileListModel extends Model {}
 @immutable
 class NoteListViewModel extends Model {
   final List<String> files;
+
+  const NoteListViewModel(this.files);
+}
+
+@immutable
+class NotePageViewModel extends Model {
+  final List<String> files;
   final int currentFileIdx;
   final Note note;
 
-  const NoteListViewModel(this.files, this.currentFileIdx, this.note);
+  const NotePageViewModel(this.files, this.currentFileIdx, this.note);
 }
 
 @immutable
