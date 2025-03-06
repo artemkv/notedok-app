@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:notedok/custom_components.dart';
 import 'package:notedok/messages.dart';
@@ -23,6 +24,9 @@ Widget home(
   }
   if (model is SignOutInProgressModel) {
     return signOutInProgress();
+  }
+  if (model is NoteLoadingModel) {
+    return noteLoading(context, model, dispatch);
   }
 
   return unknownModel(model);
@@ -62,7 +66,7 @@ Widget retrievingFileList(
       foregroundColor: Colors.white,
     ),
     drawer: drawer(context, dispatch),
-    body: Center(child: Expanded(child: spinner())),
+    body: Center(child: spinner()),
     backgroundColor: Colors.white,
   );
 }
@@ -125,59 +129,73 @@ Widget noteListView(
   return Scaffold(
     appBar: SearchableAppBar(),
     drawer: drawer(context, dispatch),
-    body: NoteListView(key: UniqueKey(), model: model, dispatch: dispatch),
+    body: Column(
+      children: [
+        noteHeader(context, model.currentFileIdx, model.files.length),
+        Expanded(
+          child: NoteListView(
+            key: UniqueKey(),
+            model: model,
+            dispatch: dispatch,
+          ),
+        ),
+      ],
+    ),
     backgroundColor: Colors.white,
   );
 }
 
-Widget noteView(String fileName) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Center(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 16.0, bottom: 12.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: textPadding / 2),
-                child: Text(
-                  fileName,
-                  style: GoogleFonts.openSans(
-                    textStyle: const TextStyle(fontSize: textFontSize),
-                  ),
-                ),
+class NoteView extends StatelessWidget {
+  final NoteListViewModel model;
+  final int pageIdx;
+
+  const NoteView({super.key, required this.model, required this.pageIdx});
+
+  @override
+  Widget build(BuildContext context) {
+    return model.currentFileIdx == pageIdx
+        ? Markdown(data: "**${model.note.title}**\n\n${model.note.text}")
+        : Container();
+  }
+}
+
+Widget noteLoading(
+  BuildContext context,
+  NoteLoadingModel model,
+  void Function(Message) dispatch,
+) {
+  return Scaffold(
+    // TODO: should I be able to search while retrieving the note?
+    appBar: SearchableAppBar(),
+    drawer: drawer(context, dispatch),
+    body: Column(
+      children: [
+        noteHeader(context, model.currentFileIdx, model.files.length),
+        Expanded(child: Center(child: spinner())),
+      ],
+    ),
+    backgroundColor: Colors.white,
+  );
+}
+
+Widget noteHeader(BuildContext context, int noteIdx, int notesTotal) {
+  return Container(
+    decoration: BoxDecoration(color: blue),
+    child: Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 4.0),
+          child: Center(
+            child: Text(
+              "${noteIdx + 1}/$notesTotal",
+              style: GoogleFonts.openSans(
+                textStyle: TextStyle(color: Colors.white),
+                fontSize: 14,
               ),
-            ],
+            ),
           ),
         ),
-      ),
-      Expanded(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(textPadding * 1.6),
-                      child: Text(
-                        """Here should be the note text""",
-                        style: GoogleFonts.openSans(
-                          textStyle: const TextStyle(
-                            fontSize: textFontSize * 1.4,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    ],
+      ],
+    ),
   );
 }

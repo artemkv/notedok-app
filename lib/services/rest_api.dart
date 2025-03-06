@@ -76,6 +76,21 @@ Future<dynamic> getJson(String endpoint, String session) async {
   }
 }
 
+// TODO: can this be merged with getJson? the only difference is in return
+Future<String> getText(String endpoint, String session) async {
+  var client = http.Client(); // TODO: re-use client if possible
+  var url = Uri.parse('$BASE_URL$endpoint');
+  var headers = {'x-session': session};
+
+  try {
+    var response = await client.get(url, headers: headers);
+    handleErrors(response);
+    return response.body;
+  } finally {
+    client.close();
+  }
+}
+
 Future<dynamic> postJson(
   String endpoint,
   Object data, {
@@ -114,4 +129,9 @@ Future<dynamic> getFiles(
     '/files?pageSize=$pageSize&continuationToken=$continuationToken',
     session,
   );
+}
+
+Future<String> getFile(String fileName, String session) async {
+  String encodedFileName = Uri.encodeComponent(fileName);
+  return await getText('/files/$encodedFileName', session);
 }

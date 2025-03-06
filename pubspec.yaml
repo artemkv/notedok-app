@@ -16,6 +16,7 @@ dependencies:
   amplify_flutter: ^2.0.0
   amplify_auth_cognito: ^2.0.0
   amplify_authenticator: ^2.0.0
+  flutter_markdown: ^0.7.6+2
 
 dev_dependencies:
   flutter_test:

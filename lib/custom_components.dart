@@ -127,7 +127,13 @@ class NoteListView extends StatefulWidget {
 }
 
 class _NoteListViewState extends State<NoteListView> {
-  final PageController _controller = PageController(initialPage: 0);
+  late PageController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = PageController(initialPage: widget.model.currentFileIdx);
+  }
 
   @override
   void dispose() {
@@ -138,13 +144,15 @@ class _NoteListViewState extends State<NoteListView> {
   @override
   Widget build(BuildContext context) {
     return PageView.builder(
-      itemCount: widget.model.files.length,
-      onPageChanged: (page) {},
+      onPageChanged: (page) {
+        widget.dispatch(MovedToNote(page));
+      },
       scrollDirection: Axis.horizontal,
       controller: _controller,
       itemBuilder: (context, index) {
-        return noteView(widget.model.files[index]);
+        return NoteView(model: widget.model, pageIdx: index);
       },
+      itemCount: widget.model.files.length,
     );
   }
 }

@@ -59,6 +59,23 @@ class SignOut implements Command {
 
 @immutable
 class LoadNoteContent implements Command {
+  final String fileName;
+
+  const LoadNoteContent(this.fileName);
+
   @override
-  void execute(void Function(Message) dispatch) async {}
+  void execute(void Function(Message) dispatch) async {
+    final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+    if (session.isSignedIn) {
+      // TODO: where can I store this?
+      var idToken = session.userPoolTokensResult.value.idToken;
+
+      try {
+        var text = await getFile(fileName, () => Future.value(idToken.raw));
+        dispatch(NoteContentLoaded(fileName, text));
+      } catch (err) {
+        dispatch(NoteContentLoadedingFailed()); // TODO: pass error
+      }
+    }
+  }
 }

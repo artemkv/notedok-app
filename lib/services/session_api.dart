@@ -19,8 +19,8 @@ Future<void> signIn(String idToken) async {
   }
 }
 
-Future<dynamic> callApi(
-  Future<dynamic> Function() f,
+Future<T> callApi<T>(
+  Future<T> Function() f,
   Future<String> Function() getIdToken,
 ) async {
   if (!hasSession()) {
@@ -52,4 +52,8 @@ Future<dynamic> getFiles(
     () => rest.getFiles(pageSize, continuationToken, session),
     getIdToken,
   );
+}
+
+Future<String> getFile(String fileName, Future<String> Function() getIdToken) {
+  return callApi(() => rest.getFile(fileName, session), getIdToken);
 }

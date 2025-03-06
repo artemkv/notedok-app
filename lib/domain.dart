@@ -27,3 +27,12 @@ class GetFilesResponse {
       hasMore = json['hasMore'],
       nextContinuationToken = json['nextContinuationToken'];
 }
+
+@immutable
+class Note {
+  final String fileName;
+  final String title;
+  final String text;
+
+  const Note(this.fileName, this.title, this.text);
+}

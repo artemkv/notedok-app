@@ -2,6 +2,7 @@
 // No side effects allowed!
 
 import 'package:flutter/material.dart';
+import 'package:notedok/domain.dart';
 
 @immutable
 abstract class Model {
@@ -13,14 +14,24 @@ abstract class Model {
 }
 
 @immutable
+class SignOutInProgressModel extends Model {}
+
+@immutable
 class RetrievingFileListModel extends Model {}
 
 @immutable
 class NoteListViewModel extends Model {
   final List<String> files;
+  final int currentFileIdx;
+  final Note note;
 
-  const NoteListViewModel(this.files);
+  const NoteListViewModel(this.files, this.currentFileIdx, this.note);
 }
 
 @immutable
-class SignOutInProgressModel extends Model {}
+class NoteLoadingModel extends Model {
+  final List<String> files;
+  final int currentFileIdx;
+
+  const NoteLoadingModel(this.files, this.currentFileIdx);
+}

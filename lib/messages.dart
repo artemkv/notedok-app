@@ -14,3 +14,23 @@ class RetrieveFileListSuccess implements Message {
 
 @immutable
 class SignOutRequested implements Message {}
+
+@immutable
+class MovedToNote implements Message {
+  final int noteIdx;
+
+  const MovedToNote(this.noteIdx);
+}
+
+@immutable
+class NoteContentLoaded implements Message {
+  final String fileName;
+  final String text;
+
+  const NoteContentLoaded(this.fileName, this.text);
+}
+
+@immutable
+class NoteContentLoadedingFailed implements Message {
+  const NoteContentLoadedingFailed();
+}
