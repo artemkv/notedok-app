@@ -82,7 +82,7 @@ class NoteListLoadFirstBatch implements Command {
           ); // TODO: convert filename to title
           notes.add(note);
         }
-        dispatch(NoteListFirstBatchLoaded(notes));
+        dispatch(NoteListViewFirstBatchLoaded(notes));
       } catch (err) {
         // TODO: dispatch error
         safePrint(err);
@@ -116,7 +116,7 @@ class NoteListLoadNextBatch implements Command {
           ); // TODO: convert filename to title
           notes.add(note);
         }
-        dispatch(NoteListNextBatchLoaded(notes));
+        dispatch(NoteListViewNextBatchLoaded(notes));
       } catch (err) {
         // TODO: dispatch error
         safePrint(err);
@@ -140,9 +140,9 @@ class LoadNoteContent implements Command {
 
       try {
         var text = await getFile(fileName, () => Future.value(idToken.raw));
-        dispatch(NoteContentLoaded(fileName, text));
+        dispatch(NotePageViewNoteContentLoaded(fileName, text));
       } catch (err) {
-        dispatch(NoteContentLoadedingFailed()); // TODO: pass error
+        dispatch(NotePageViewNoteContentLoadingFailed()); // TODO: pass error
       }
     }
   }

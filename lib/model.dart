@@ -27,11 +27,11 @@ class FileListRetrievedModel extends Model {
 }
 
 @immutable
-class NoteListModel extends Model {
+class NoteListViewModel extends Model {
   final List<NoteListItem> items;
   final List<String> unprocessedFiles;
 
-  const NoteListModel(this.items, this.unprocessedFiles);
+  const NoteListViewModel(this.items, this.unprocessedFiles);
 }
 
 @immutable
@@ -101,9 +101,9 @@ class NotePageViewModel extends Model {
 }
 
 @immutable
-class NoteLoadingModel extends Model {
+class NotePageViewNoteLoadingModel extends Model {
   final List<String> files;
   final int currentFileIdx;
 
-  const NoteLoadingModel(this.files, this.currentFileIdx);
+  const NotePageViewNoteLoadingModel(this.files, this.currentFileIdx);
 }

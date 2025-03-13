@@ -119,7 +119,7 @@ class _SearchableAppBarState extends State<SearchableAppBar> {
 }
 
 class NoteList extends StatefulWidget {
-  final NoteListModel model;
+  final NoteListViewModel model;
   final void Function(Message) dispatch;
 
   const NoteList({super.key, required this.model, required this.dispatch});
@@ -148,7 +148,7 @@ class _NoteListState extends State<NoteList> {
       itemBuilder: (BuildContext context, int index) {
         var item = widget.model.items[index];
         if (item is NoteListItemNote) {
-          return noteListItem(item.note);
+          return noteListItem(item.note, widget.dispatch);
         }
         if (item is NoteListItemLoadMoreTrigger) {
           return ListTile(
@@ -190,7 +190,7 @@ class _NoteListItemLoadMoreState extends State<NoteListItemLoadMore> {
       onVisibilityChanged: (visibilityInfo) {
         if (!fired) {
           if (visibilityInfo.visibleFraction > 0.0) {
-            widget.dispatch(NoteListNextBatchRequested());
+            widget.dispatch(NoteListViewNextBatchRequested());
             setFired();
           }
         }
@@ -241,7 +241,7 @@ class _NotePageViewState extends State<NotePageView> {
   Widget build(BuildContext context) {
     return PageView.builder(
       onPageChanged: (page) {
-        widget.dispatch(MovedToNote(page));
+        widget.dispatch(NotePageViewMovedToNote(page));
       },
       scrollDirection: Axis.horizontal,
       controller: _controller,

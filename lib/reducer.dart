@@ -28,7 +28,7 @@ ModelAndCommand reduce(Model model, Message message) {
       NoteListLoadFirstBatch(message.files.take(noteBatchSize).toList()),
     );
   }
-  if (message is NoteListFirstBatchLoaded) {
+  if (message is NoteListViewFirstBatchLoaded) {
     if (model is FileListRetrievedModel) {
       var listItems =
           message.notes
@@ -38,13 +38,13 @@ ModelAndCommand reduce(Model model, Message message) {
         listItems.add(NoteListItemLoadMoreTrigger());
       }
       return ModelAndCommand.justModel(
-        NoteListModel(listItems, model.unprocessedFiles),
+        NoteListViewModel(listItems, model.unprocessedFiles),
       );
     }
     return ModelAndCommand.justModel(model);
   }
-  if (message is NoteListNextBatchRequested) {
-    if (model is NoteListModel) {
+  if (message is NoteListViewNextBatchRequested) {
+    if (model is NoteListViewModel) {
       var updatedItems = <NoteListItem>[];
       updatedItems.addAll(
         model.items.getRange(0, model.items.length - 1),
@@ -52,7 +52,7 @@ ModelAndCommand reduce(Model model, Message message) {
       updatedItems.add(NoteListItemLoadingMore());
 
       return ModelAndCommand(
-        NoteListModel(
+        NoteListViewModel(
           updatedItems,
           model.unprocessedFiles.skip(noteBatchSize).toList(),
         ),
@@ -63,8 +63,8 @@ ModelAndCommand reduce(Model model, Message message) {
     }
     return ModelAndCommand.justModel(model);
   }
-  if (message is NoteListNextBatchLoaded) {
-    if (model is NoteListModel) {
+  if (message is NoteListViewNextBatchLoaded) {
+    if (model is NoteListViewModel) {
       var listItems =
           message.notes
               .map((note) => NoteListItemNote(note) as NoteListItem)
@@ -80,25 +80,36 @@ ModelAndCommand reduce(Model model, Message message) {
       }
 
       return ModelAndCommand.justModel(
-        NoteListModel(updatedItems, model.unprocessedFiles),
+        NoteListViewModel(updatedItems, model.unprocessedFiles),
       );
     }
     return ModelAndCommand.justModel(model);
   }
-  if (message is NoteListReloadRequested) {
+  if (message is NoteListViewReloadRequested) {
     return ModelAndCommand(RetrievingFileListModel(), RetrieveFileList());
   }
 
-  if (message is MovedToNote) {
+  if (message is NoteListViewMoveToPageView) {
+    if (model is NoteListViewModel) {
+      // TODO: now is all fake
+      return ModelAndCommand(
+        NotePageViewNoteLoadingModel(model.unprocessedFiles, 0),
+        LoadNoteContent(model.unprocessedFiles[0]),
+      );
+    }
+    return ModelAndCommand.justModel(model);
+  }
+
+  if (message is NotePageViewMovedToNote) {
     if (model is NotePageViewModel) {
       return ModelAndCommand(
-        NoteLoadingModel(model.files, message.noteIdx),
+        NotePageViewNoteLoadingModel(model.files, message.noteIdx),
         LoadNoteContent(model.files[message.noteIdx]),
       );
     }
   }
-  if (message is NoteContentLoaded) {
-    if (model is NoteLoadingModel) {
+  if (message is NotePageViewNoteContentLoaded) {
+    if (model is NotePageViewNoteLoadingModel) {
       if (model.files[model.currentFileIdx] == message.fileName) {
         return ModelAndCommand.justModel(
           NotePageViewModel(

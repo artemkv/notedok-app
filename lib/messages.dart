@@ -17,41 +17,44 @@ class RetrieveFileListSuccess implements Message {
 }
 
 @immutable
-class NoteListFirstBatchLoaded implements Message {
+class NoteListViewFirstBatchLoaded implements Message {
   final List<Note> notes;
 
-  const NoteListFirstBatchLoaded(this.notes);
+  const NoteListViewFirstBatchLoaded(this.notes);
 }
 
 @immutable
-class NoteListNextBatchRequested implements Message {}
+class NoteListViewNextBatchRequested implements Message {}
 
 @immutable
-class NoteListNextBatchLoaded implements Message {
+class NoteListViewNextBatchLoaded implements Message {
   final List<Note> notes;
 
-  const NoteListNextBatchLoaded(this.notes);
+  const NoteListViewNextBatchLoaded(this.notes);
 }
 
 @immutable
-class NoteListReloadRequested implements Message {}
+class NoteListViewReloadRequested implements Message {}
 
 @immutable
-class MovedToNote implements Message {
+class NoteListViewMoveToPageView implements Message {}
+
+@immutable
+class NotePageViewMovedToNote implements Message {
   final int noteIdx;
 
-  const MovedToNote(this.noteIdx);
+  const NotePageViewMovedToNote(this.noteIdx);
 }
 
 @immutable
-class NoteContentLoaded implements Message {
+class NotePageViewNoteContentLoaded implements Message {
   final String fileName;
   final String text;
 
-  const NoteContentLoaded(this.fileName, this.text);
+  const NotePageViewNoteContentLoaded(this.fileName, this.text);
 }
 
 @immutable
-class NoteContentLoadedingFailed implements Message {
-  const NoteContentLoadedingFailed();
+class NotePageViewNoteContentLoadingFailed implements Message {
+  const NotePageViewNoteContentLoadingFailed();
 }

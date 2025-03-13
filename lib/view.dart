@@ -17,23 +17,23 @@ Widget home(
   Model model,
   void Function(Message) dispatch,
 ) {
+  if (model is SignOutInProgressModel) {
+    return signOutInProgress();
+  }
   if (model is RetrievingFileListModel) {
     return retrievingFileList(context, model, dispatch);
   }
   if (model is FileListRetrievedModel) {
     return fileListRetrieved(context, model, dispatch);
   }
-  if (model is NoteListModel) {
+  if (model is NoteListViewModel) {
     return noteListView(context, model, dispatch);
   }
   if (model is NotePageViewModel) {
     return notePageView(context, model, dispatch);
   }
-  if (model is SignOutInProgressModel) {
-    return signOutInProgress();
-  }
-  if (model is NoteLoadingModel) {
-    return noteLoading(context, model, dispatch);
+  if (model is NotePageViewNoteLoadingModel) {
+    return notePageViewNoteLoading(context, model, dispatch);
   }
 
   return unknownModel(model);
@@ -157,7 +157,7 @@ Widget drawer(BuildContext context, void Function(Message) dispatch) {
 
 Widget noteListView(
   BuildContext context,
-  NoteListModel model,
+  NoteListViewModel model,
   void Function(Message) dispatch,
 ) {
   return Scaffold(
@@ -165,7 +165,7 @@ Widget noteListView(
     drawer: drawer(context, dispatch),
     body: RefreshIndicator(
       onRefresh: () {
-        dispatch(NoteListReloadRequested());
+        dispatch(NoteListViewReloadRequested());
         return Future<void>.value(null);
       },
       child: NoteList(model: model, dispatch: dispatch),
@@ -174,32 +174,38 @@ Widget noteListView(
   );
 }
 
-Widget noteListItem(Note note) {
-  return SizedBox(
-    height: 160,
-    child: Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.only(top: 16, bottom: 16, left: 16, right: 16),
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: Text(
-              note.title,
-              style: GoogleFonts.openSans(
-                fontSize: textFontSize,
-                fontWeight: FontWeight.w600,
+Widget noteListItem(Note note, void Function(Message) dispatch) {
+  return GestureDetector(
+    behavior: HitTestBehavior.translucent,
+    onTap: () {
+      dispatch(NoteListViewMoveToPageView());
+    },
+    child: SizedBox(
+      height: 160,
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: 16, bottom: 16, left: 16, right: 16),
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                note.title,
+                style: GoogleFonts.openSans(
+                  fontSize: textFontSize,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
-        ),
-        Expanded(
-          // TODO: can this show links? Should it?
-          child: Padding(
-            padding: EdgeInsets.only(top: 4, bottom: 16, left: 16, right: 16),
-            child: Text(note.text),
+          Expanded(
+            // TODO: can this show links? Should it?
+            child: Padding(
+              padding: EdgeInsets.only(top: 4, bottom: 16, left: 16, right: 16),
+              child: Text(note.text),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }
@@ -255,14 +261,15 @@ class NoteView extends StatelessWidget {
   }
 }
 
-Widget noteLoading(
+Widget notePageViewNoteLoading(
   BuildContext context,
-  NoteLoadingModel model,
+  NotePageViewNoteLoadingModel model,
   void Function(Message) dispatch,
 ) {
   return Scaffold(
-    // TODO: should I be able to search while retrieving the note?
+    // TODO: this should not be searchable
     appBar: SearchableAppBar(),
+    // TODO: probably no drawer
     drawer: drawer(context, dispatch),
     body: Column(
       children: [

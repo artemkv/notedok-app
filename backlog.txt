@@ -1,6 +1,6 @@
 List view:
-- swipe down to reload
-- load more on scroll down
+- --swipe down to reload--
+- --load more on scroll down--
 - try extracting first 5 lines and rendering as markdown
 - new note button
 - show error if cannot load
