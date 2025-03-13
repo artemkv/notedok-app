@@ -51,27 +51,40 @@ Widget spinner() {
   );
 }
 
+Widget signOutInProgress() {
+  return Material(
+    type: MaterialType.transparency,
+    child: Container(
+      decoration: BoxDecoration(color: blue),
+      child: const Column(children: []),
+    ),
+  );
+}
+
+AppBar defaultAppBar(BuildContext context) {
+  return AppBar(
+    title: Text(
+      'NotedOK',
+      style: GoogleFonts.openSans(
+        textStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 22,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    ),
+    backgroundColor: Theme.of(context).colorScheme.primary,
+    foregroundColor: Colors.white,
+  );
+}
+
 Widget retrievingFileList(
   BuildContext context,
   RetrievingFileListModel model,
   void Function(Message) dispatch,
 ) {
   return Scaffold(
-    // TODO: should I be able to search while retrieving the list of notes?
-    appBar: AppBar(
-      title: Text(
-        'NotedOK',
-        style: GoogleFonts.openSans(
-          textStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ),
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      foregroundColor: Colors.white,
-    ),
+    appBar: defaultAppBar(context),
     drawer: drawer(context, dispatch),
     body: Center(child: spinner()),
     backgroundColor: Colors.white,
@@ -84,34 +97,10 @@ Widget fileListRetrieved(
   void Function(Message) dispatch,
 ) {
   return Scaffold(
-    // TODO: should I be able to search while retrieving the list of notes?
-    appBar: AppBar(
-      title: Text(
-        'NotedOK',
-        style: GoogleFonts.openSans(
-          textStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ),
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      foregroundColor: Colors.white,
-    ),
+    appBar: defaultAppBar(context),
     drawer: drawer(context, dispatch),
     body: Center(child: spinner()),
     backgroundColor: Colors.white,
-  );
-}
-
-Widget signOutInProgress() {
-  return Material(
-    type: MaterialType.transparency,
-    child: Container(
-      decoration: BoxDecoration(color: blue),
-      child: const Column(children: []),
-    ),
   );
 }
 
@@ -223,25 +212,64 @@ Widget noteListItemLoadingMore() {
   );
 }
 
+AppBar notePageViewAppBar(BuildContext context, int noteIdx, int notesTotal) {
+  return AppBar(
+    leading: const BackButton(),
+    title: Text(
+      "${noteIdx + 1}/$notesTotal",
+      style: GoogleFonts.openSans(
+        textStyle: TextStyle(color: Colors.white),
+        fontSize: textFontSize,
+      ),
+    ),
+    backgroundColor: Theme.of(context).colorScheme.primary,
+    foregroundColor: Colors.white,
+  );
+}
+
+Widget notePageViewNoteLoading(
+  BuildContext context,
+  NotePageViewNoteLoadingModel model,
+  void Function(Message) dispatch,
+) {
+  return Scaffold(
+    appBar: notePageViewAppBar(
+      context,
+      model.currentFileIdx,
+      model.files.length,
+    ),
+    body: Column(children: [Expanded(child: Center(child: spinner()))]),
+    backgroundColor: Colors.white,
+  );
+}
+
 Widget notePageView(
   BuildContext context,
   NotePageViewModel model,
   void Function(Message) dispatch,
 ) {
   return Scaffold(
-    appBar: SearchableAppBar(),
-    drawer: drawer(context, dispatch),
-    body: Column(
-      children: [
-        noteHeader(context, model.currentFileIdx, model.files.length),
-        Expanded(
-          child: NotePageView(
-            key: UniqueKey(),
-            model: model,
-            dispatch: dispatch,
+    appBar: notePageViewAppBar(
+      context,
+      model.currentFileIdx,
+      model.files.length,
+    ),
+    body: PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        dispatch(NotePageViewMoveToListView());
+      },
+      child: Column(
+        children: [
+          Expanded(
+            child: NotePageView(
+              key: UniqueKey(),
+              model: model,
+              dispatch: dispatch,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
     backgroundColor: Colors.white,
   );
@@ -259,46 +287,4 @@ class NoteView extends StatelessWidget {
         ? Markdown(data: "**${model.note.title}**\n\n${model.note.text}")
         : Container();
   }
-}
-
-Widget notePageViewNoteLoading(
-  BuildContext context,
-  NotePageViewNoteLoadingModel model,
-  void Function(Message) dispatch,
-) {
-  return Scaffold(
-    // TODO: this should not be searchable
-    appBar: SearchableAppBar(),
-    // TODO: probably no drawer
-    drawer: drawer(context, dispatch),
-    body: Column(
-      children: [
-        noteHeader(context, model.currentFileIdx, model.files.length),
-        Expanded(child: Center(child: spinner())),
-      ],
-    ),
-    backgroundColor: Colors.white,
-  );
-}
-
-Widget noteHeader(BuildContext context, int noteIdx, int notesTotal) {
-  return Container(
-    decoration: BoxDecoration(color: blue),
-    child: Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 4.0),
-          child: Center(
-            child: Text(
-              "${noteIdx + 1}/$notesTotal",
-              style: GoogleFonts.openSans(
-                textStyle: TextStyle(color: Colors.white),
-                fontSize: 14,
-              ),
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
 }

@@ -40,6 +40,9 @@ class NoteListViewReloadRequested implements Message {}
 class NoteListViewMoveToPageView implements Message {}
 
 @immutable
+class NotePageViewMoveToListView implements Message {}
+
+@immutable
 class NotePageViewMovedToNote implements Message {
   final int noteIdx;
 

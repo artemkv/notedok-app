@@ -99,6 +99,9 @@ ModelAndCommand reduce(Model model, Message message) {
     }
     return ModelAndCommand.justModel(model);
   }
+  if (message is NotePageViewMoveToListView) {
+    return ModelAndCommand(RetrievingFileListModel(), RetrieveFileList());
+  }
 
   if (message is NotePageViewMovedToNote) {
     if (model is NotePageViewModel) {
