@@ -160,6 +160,10 @@ Widget noteListView(
       child: NoteList(model: model, dispatch: dispatch),
     ),
     backgroundColor: Colors.white,
+    floatingActionButton: (FloatingActionButton(
+      onPressed: () {},
+      child: const Icon(Icons.add),
+    )),
   );
 }
 
@@ -222,6 +226,13 @@ AppBar notePageViewAppBar(BuildContext context, int noteIdx, int notesTotal) {
         fontSize: textFontSize,
       ),
     ),
+    actions: [
+      IconButton(
+        icon: const Icon(Icons.edit),
+        tooltip: 'Edit',
+        onPressed: () {},
+      ),
+    ],
     backgroundColor: Theme.of(context).colorScheme.primary,
     foregroundColor: Colors.white,
   );
