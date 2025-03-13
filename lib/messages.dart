@@ -38,9 +38,10 @@ class NoteListViewReloadRequested implements Message {}
 
 @immutable
 class NoteListViewMoveToPageView implements Message {
+  final Note note;
   final int noteIdx;
 
-  const NoteListViewMoveToPageView(this.noteIdx);
+  const NoteListViewMoveToPageView(this.note, this.noteIdx);
 }
 
 @immutable

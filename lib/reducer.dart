@@ -95,9 +95,8 @@ ModelAndCommand reduce(Model model, Message message) {
 
   if (message is NoteListViewMoveToPageView) {
     if (model is NoteListViewModel) {
-      return ModelAndCommand(
-        NotePageViewNoteLoadingModel(model.files, message.noteIdx),
-        LoadNoteContent(model.files[message.noteIdx]),
+      return ModelAndCommand.justModel(
+        NotePageViewModel(model.files, message.noteIdx, message.note),
       );
     }
     return ModelAndCommand.justModel(model);
