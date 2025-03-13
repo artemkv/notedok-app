@@ -34,6 +34,9 @@ class NoteListNextBatchLoaded implements Message {
 }
 
 @immutable
+class NoteListReloadRequested implements Message {}
+
+@immutable
 class MovedToNote implements Message {
   final int noteIdx;
 

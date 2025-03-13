@@ -85,6 +85,9 @@ ModelAndCommand reduce(Model model, Message message) {
     }
     return ModelAndCommand.justModel(model);
   }
+  if (message is NoteListReloadRequested) {
+    return ModelAndCommand(RetrievingFileListModel(), RetrieveFileList());
+  }
 
   if (message is MovedToNote) {
     if (model is NotePageViewModel) {

@@ -163,7 +163,13 @@ Widget noteListView(
   return Scaffold(
     appBar: SearchableAppBar(),
     drawer: drawer(context, dispatch),
-    body: NoteList(model: model, dispatch: dispatch),
+    body: RefreshIndicator(
+      onRefresh: () {
+        dispatch(NoteListReloadRequested());
+        return Future<void>.value(null);
+      },
+      child: NoteList(model: model, dispatch: dispatch),
+    ),
     backgroundColor: Colors.white,
   );
 }

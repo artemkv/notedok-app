@@ -134,6 +134,7 @@ class _NoteListState extends State<NoteList> {
   @override
   Widget build(BuildContext context) {
     return ScrollablePositionedList.separated(
+      physics: const AlwaysScrollableScrollPhysics(),
       itemScrollController: _controller,
       itemCount: widget.model.items.length,
       separatorBuilder: (BuildContext context, int index) {
