@@ -131,5 +131,20 @@ ModelAndCommand reduce(Model model, Message message) {
     }
   }
 
+  if (message is CreateNewNote) {
+    var note = Note("", "", ""); // TODO:
+    return ModelAndCommand.justModel(NoteEditorModel(note));
+  }
+  if (message is CancelNewNoteCreation) {
+    return ModelAndCommand(RetrievingFileListModel(), RetrieveFileList());
+  }
+  if (message is SaveNewNote) {
+    // TODO: this is now just re-loading the list
+    return ModelAndCommand(RetrievingFileListModel(), RetrieveFileList());
+  }
+  if (message is EditNote) {
+    return ModelAndCommand.justModel(NoteEditorModel(message.note));
+  }
+
   return ModelAndCommand.justModel(model);
 }

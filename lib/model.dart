@@ -109,3 +109,10 @@ class NotePageViewNoteLoadingModel extends Model {
 
   const NotePageViewNoteLoadingModel(this.files, this.currentFileIdx);
 }
+
+@immutable
+class NoteEditorModel extends Model {
+  final Note note;
+
+  const NoteEditorModel(this.note);
+}

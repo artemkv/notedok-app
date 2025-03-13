@@ -252,3 +252,109 @@ class _NotePageViewState extends State<NotePageView> {
     );
   }
 }
+
+class NoteEditor extends StatefulWidget {
+  final NoteEditorModel model;
+  final void Function(Message) dispatch;
+
+  const NoteEditor({super.key, required this.model, required this.dispatch});
+
+  @override
+  State<NoteEditor> createState() => _NoteEditorState();
+}
+
+class _NoteEditorState extends State<NoteEditor> {
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _textController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController.text = widget.model.note.title;
+    _textController.text = widget.model.note.text;
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _textController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: const BackButton(),
+        title: const Text('New note'), // TODO:
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.check),
+            tooltip: 'Save',
+            onPressed: () {
+              widget.dispatch(SaveNewNote()); // TODO: or modified note
+            },
+          ),
+        ],
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+      ),
+      body: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          widget.dispatch(CancelNewNoteCreation()); // TODO: or editing
+        },
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(
+                top: textPadding,
+                left: textPadding * 2,
+                right: textPadding * 2,
+                bottom: textPadding,
+              ),
+              child: TextField(
+                maxLength: 50,
+                controller: _titleController,
+                // TODO: maybe only if empty, otherwise auto-focus text?
+                autofocus: true,
+                style: const TextStyle(fontSize: textFontSize),
+                maxLines: 1,
+                keyboardType: TextInputType.multiline,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  hintText: 'No title',
+                ),
+              ),
+            ),
+            const Divider(height: 12, thickness: 1, indent: 12, endIndent: 12),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  top: textPadding,
+                  left: textPadding * 2,
+                  right: textPadding * 2,
+                  bottom: textPadding,
+                ),
+                child: TextField(
+                  maxLength: 100000,
+                  controller: _textController,
+                  autofocus: true,
+                  style: const TextStyle(fontSize: textFontSize),
+                  maxLines: null,
+                  keyboardType: TextInputType.multiline,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Type your text here',
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -35,6 +35,9 @@ Widget home(
   if (model is NotePageViewNoteLoadingModel) {
     return notePageViewNoteLoading(context, model, dispatch);
   }
+  if (model is NoteEditorModel) {
+    return NoteEditor(model: model, dispatch: dispatch);
+  }
 
   return unknownModel(model);
 }
@@ -161,7 +164,9 @@ Widget noteListView(
     ),
     backgroundColor: Colors.white,
     floatingActionButton: (FloatingActionButton(
-      onPressed: () {},
+      onPressed: () {
+        dispatch(CreateNewNote());
+      },
       child: const Icon(Icons.add),
     )),
   );
@@ -216,7 +221,13 @@ Widget noteListItemLoadingMore() {
   );
 }
 
-AppBar notePageViewAppBar(BuildContext context, int noteIdx, int notesTotal) {
+AppBar notePageViewAppBar(
+  BuildContext context,
+  int noteIdx,
+  int notesTotal,
+  Note? note,
+  void Function(Message) dispatch,
+) {
   return AppBar(
     leading: const BackButton(),
     title: Text(
@@ -230,7 +241,11 @@ AppBar notePageViewAppBar(BuildContext context, int noteIdx, int notesTotal) {
       IconButton(
         icon: const Icon(Icons.edit),
         tooltip: 'Edit',
-        onPressed: () {},
+        onPressed: () {
+          if (note != null) {
+            dispatch(EditNote(note));
+          }
+        },
       ),
     ],
     backgroundColor: Theme.of(context).colorScheme.primary,
@@ -248,6 +263,8 @@ Widget notePageViewNoteLoading(
       context,
       model.currentFileIdx,
       model.files.length,
+      null,
+      dispatch,
     ),
     body: Column(children: [Expanded(child: Center(child: spinner()))]),
     backgroundColor: Colors.white,
@@ -264,6 +281,8 @@ Widget notePageView(
       context,
       model.currentFileIdx,
       model.files.length,
+      model.note,
+      dispatch,
     ),
     body: PopScope(
       canPop: false,

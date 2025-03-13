@@ -66,3 +66,21 @@ class NotePageViewNoteContentLoaded implements Message {
 class NotePageViewNoteContentLoadingFailed implements Message {
   const NotePageViewNoteContentLoadingFailed();
 }
+
+// TODO: continue with this
+
+@immutable
+class CreateNewNote implements Message {}
+
+@immutable
+class CancelNewNoteCreation implements Message {}
+
+@immutable
+class SaveNewNote implements Message {}
+
+@immutable
+class EditNote implements Message {
+  final Note note;
+
+  const EditNote(this.note);
+}
