@@ -1,0 +1,21 @@
+List view:
+- swipe down to reload
+- load more on scroll down
+- try extracting first 5 lines and rendering as markdown
+- new note button
+- show error if cannot load
+
+Card view:
+- convert to markdown
+- render markdown
+- edit note button
+- show counter
+- follow links
+
+Search:
+- when submitted, reload with filter
+
+Optimizations:
+- load up to 6 notes in parallel
+- cache by etag
+

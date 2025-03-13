@@ -5,6 +5,7 @@ import 'package:notedok/messages.dart';
 import 'package:notedok/model.dart';
 import 'package:notedok/view.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class SearchableAppBar extends StatefulWidget implements PreferredSizeWidget {
   const SearchableAppBar({super.key});
@@ -148,9 +149,64 @@ class _NoteListState extends State<NoteList> {
         if (item is NoteListItemNote) {
           return noteListItem(item.note);
         }
+        if (item is NoteListItemLoadMoreTrigger) {
+          return ListTile(
+            title: NoteListItemLoadMore(dispatch: widget.dispatch),
+          );
+        }
+        if (item is NoteListItemLoadingMore) {
+          return ListTile(title: noteListItemLoadingMore());
+        }
 
         throw "Unknown type of NoteListItem";
       },
+    );
+  }
+}
+
+class NoteListItemLoadMore extends StatefulWidget {
+  final void Function(Message) dispatch;
+
+  const NoteListItemLoadMore({super.key, required this.dispatch});
+
+  @override
+  State<NoteListItemLoadMore> createState() => _NoteListItemLoadMoreState();
+}
+
+class _NoteListItemLoadMoreState extends State<NoteListItemLoadMore> {
+  bool fired = false;
+
+  void setFired() {
+    setState(() {
+      fired = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return VisibilityDetector(
+      key: GlobalKey(),
+      onVisibilityChanged: (visibilityInfo) {
+        if (!fired) {
+          if (visibilityInfo.visibleFraction > 0.0) {
+            widget.dispatch(NoteListNextBatchRequested());
+            setFired();
+          }
+        }
+      },
+      child: Row(
+        children: [
+          Expanded(
+            child: Align(
+              alignment: Alignment.center,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: spinner(),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

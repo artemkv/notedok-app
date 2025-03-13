@@ -20,6 +20,9 @@ Widget home(
   if (model is RetrievingFileListModel) {
     return retrievingFileList(context, model, dispatch);
   }
+  if (model is FileListRetrievedModel) {
+    return fileListRetrieved(context, model, dispatch);
+  }
   if (model is NoteListModel) {
     return noteListView(context, model, dispatch);
   }
@@ -51,6 +54,33 @@ Widget spinner() {
 Widget retrievingFileList(
   BuildContext context,
   RetrievingFileListModel model,
+  void Function(Message) dispatch,
+) {
+  return Scaffold(
+    // TODO: should I be able to search while retrieving the list of notes?
+    appBar: AppBar(
+      title: Text(
+        'NotedOK',
+        style: GoogleFonts.openSans(
+          textStyle: TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      foregroundColor: Colors.white,
+    ),
+    drawer: drawer(context, dispatch),
+    body: Center(child: spinner()),
+    backgroundColor: Colors.white,
+  );
+}
+
+Widget fileListRetrieved(
+  BuildContext context,
+  FileListRetrievedModel model,
   void Function(Message) dispatch,
 ) {
   return Scaffold(
@@ -165,6 +195,19 @@ Widget noteListItem(Note note) {
         ),
       ],
     ),
+  );
+}
+
+Widget noteListItemLoadingMore() {
+  return Row(
+    children: [
+      Expanded(
+        child: Align(
+          alignment: Alignment.center,
+          child: Padding(padding: const EdgeInsets.all(12.0), child: spinner()),
+        ),
+      ),
+    ],
   );
 }
 

@@ -16,10 +16,21 @@ class RetrieveFileListSuccess implements Message {
   const RetrieveFileListSuccess(this.files);
 }
 
-class FirstBatchOfNotesLoaded implements Message {
+@immutable
+class NoteListFirstBatchLoaded implements Message {
   final List<Note> notes;
 
-  const FirstBatchOfNotesLoaded(this.notes);
+  const NoteListFirstBatchLoaded(this.notes);
+}
+
+@immutable
+class NoteListNextBatchRequested implements Message {}
+
+@immutable
+class NoteListNextBatchLoaded implements Message {
+  final List<Note> notes;
+
+  const NoteListNextBatchLoaded(this.notes);
 }
 
 @immutable

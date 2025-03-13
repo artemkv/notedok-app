@@ -21,17 +21,71 @@ ModelAndCommand reduce(Model model, Message message) {
   if (message is SignOutRequested) {
     return ModelAndCommand(SignOutInProgressModel(), SignOut());
   }
+
   if (message is RetrieveFileListSuccess) {
     return ModelAndCommand(
-      model,
-      LoadFirstBatchOfNotes(message.files.take(noteBatchSize).toList()),
+      FileListRetrievedModel(message.files.skip(noteBatchSize).toList()),
+      NoteListLoadFirstBatch(message.files.take(noteBatchSize).toList()),
     );
   }
-  if (message is FirstBatchOfNotesLoaded) {
-    var listItems =
-        message.notes.map((note) => NoteListItemNote(note)).toList();
-    return ModelAndCommand.justModel(NoteListModel(listItems));
+  if (message is NoteListFirstBatchLoaded) {
+    if (model is FileListRetrievedModel) {
+      var listItems =
+          message.notes
+              .map((note) => NoteListItemNote(note) as NoteListItem)
+              .toList();
+      if (model.unprocessedFiles.isNotEmpty) {
+        listItems.add(NoteListItemLoadMoreTrigger());
+      }
+      return ModelAndCommand.justModel(
+        NoteListModel(listItems, model.unprocessedFiles),
+      );
+    }
+    return ModelAndCommand.justModel(model);
   }
+  if (message is NoteListNextBatchRequested) {
+    if (model is NoteListModel) {
+      var updatedItems = <NoteListItem>[];
+      updatedItems.addAll(
+        model.items.getRange(0, model.items.length - 1),
+      ); // old items except the spinner
+      updatedItems.add(NoteListItemLoadingMore());
+
+      return ModelAndCommand(
+        NoteListModel(
+          updatedItems,
+          model.unprocessedFiles.skip(noteBatchSize).toList(),
+        ),
+        NoteListLoadNextBatch(
+          model.unprocessedFiles.take(noteBatchSize).toList(),
+        ),
+      );
+    }
+    return ModelAndCommand.justModel(model);
+  }
+  if (message is NoteListNextBatchLoaded) {
+    if (model is NoteListModel) {
+      var listItems =
+          message.notes
+              .map((note) => NoteListItemNote(note) as NoteListItem)
+              .toList();
+
+      var updatedItems = <NoteListItem>[];
+      updatedItems.addAll(
+        model.items.getRange(0, model.items.length - 1),
+      ); // old items except the spinner
+      updatedItems.addAll(listItems);
+      if (model.unprocessedFiles.isNotEmpty) {
+        updatedItems.add(NoteListItemLoadMoreTrigger());
+      }
+
+      return ModelAndCommand.justModel(
+        NoteListModel(updatedItems, model.unprocessedFiles),
+      );
+    }
+    return ModelAndCommand.justModel(model);
+  }
+
   if (message is MovedToNote) {
     if (model is NotePageViewModel) {
       return ModelAndCommand(
