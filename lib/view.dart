@@ -163,11 +163,11 @@ Widget noteListView(
   );
 }
 
-Widget noteListItem(Note note, void Function(Message) dispatch) {
+Widget noteListItem(Note note, int noteIdx, void Function(Message) dispatch) {
   return GestureDetector(
     behavior: HitTestBehavior.translucent,
     onTap: () {
-      dispatch(NoteListViewMoveToPageView());
+      dispatch(NoteListViewMoveToPageView(noteIdx));
     },
     child: SizedBox(
       height: 160,

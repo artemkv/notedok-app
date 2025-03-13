@@ -37,7 +37,11 @@ class NoteListViewNextBatchLoaded implements Message {
 class NoteListViewReloadRequested implements Message {}
 
 @immutable
-class NoteListViewMoveToPageView implements Message {}
+class NoteListViewMoveToPageView implements Message {
+  final int noteIdx;
+
+  const NoteListViewMoveToPageView(this.noteIdx);
+}
 
 @immutable
 class NotePageViewMoveToListView implements Message {}

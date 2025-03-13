@@ -21,17 +21,19 @@ class RetrievingFileListModel extends Model {}
 
 @immutable
 class FileListRetrievedModel extends Model {
+  final List<String> files;
   final List<String> unprocessedFiles;
 
-  const FileListRetrievedModel(this.unprocessedFiles);
+  const FileListRetrievedModel(this.files, this.unprocessedFiles);
 }
 
 @immutable
 class NoteListViewModel extends Model {
-  final List<NoteListItem> items;
+  final List<String> files;
   final List<String> unprocessedFiles;
+  final List<NoteListItem> items;
 
-  const NoteListViewModel(this.items, this.unprocessedFiles);
+  const NoteListViewModel(this.files, this.unprocessedFiles, this.items);
 }
 
 @immutable

@@ -148,7 +148,7 @@ class _NoteListState extends State<NoteList> {
       itemBuilder: (BuildContext context, int index) {
         var item = widget.model.items[index];
         if (item is NoteListItemNote) {
-          return noteListItem(item.note, widget.dispatch);
+          return noteListItem(item.note, index, widget.dispatch);
         }
         if (item is NoteListItemLoadMoreTrigger) {
           return ListTile(

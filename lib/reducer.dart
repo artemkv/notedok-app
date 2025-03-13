@@ -24,7 +24,10 @@ ModelAndCommand reduce(Model model, Message message) {
 
   if (message is RetrieveFileListSuccess) {
     return ModelAndCommand(
-      FileListRetrievedModel(message.files.skip(noteBatchSize).toList()),
+      FileListRetrievedModel(
+        message.files,
+        message.files.skip(noteBatchSize).toList(),
+      ),
       NoteListLoadFirstBatch(message.files.take(noteBatchSize).toList()),
     );
   }
@@ -38,7 +41,7 @@ ModelAndCommand reduce(Model model, Message message) {
         listItems.add(NoteListItemLoadMoreTrigger());
       }
       return ModelAndCommand.justModel(
-        NoteListViewModel(listItems, model.unprocessedFiles),
+        NoteListViewModel(model.files, model.unprocessedFiles, listItems),
       );
     }
     return ModelAndCommand.justModel(model);
@@ -53,8 +56,9 @@ ModelAndCommand reduce(Model model, Message message) {
 
       return ModelAndCommand(
         NoteListViewModel(
-          updatedItems,
+          model.files,
           model.unprocessedFiles.skip(noteBatchSize).toList(),
+          updatedItems,
         ),
         NoteListLoadNextBatch(
           model.unprocessedFiles.take(noteBatchSize).toList(),
@@ -80,7 +84,7 @@ ModelAndCommand reduce(Model model, Message message) {
       }
 
       return ModelAndCommand.justModel(
-        NoteListViewModel(updatedItems, model.unprocessedFiles),
+        NoteListViewModel(model.files, model.unprocessedFiles, updatedItems),
       );
     }
     return ModelAndCommand.justModel(model);
@@ -91,10 +95,9 @@ ModelAndCommand reduce(Model model, Message message) {
 
   if (message is NoteListViewMoveToPageView) {
     if (model is NoteListViewModel) {
-      // TODO: now is all fake
       return ModelAndCommand(
-        NotePageViewNoteLoadingModel(model.unprocessedFiles, 0),
-        LoadNoteContent(model.unprocessedFiles[0]),
+        NotePageViewNoteLoadingModel(model.files, message.noteIdx),
+        LoadNoteContent(model.files[message.noteIdx]),
       );
     }
     return ModelAndCommand.justModel(model);
