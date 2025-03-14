@@ -3,6 +3,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:notedok/custom_components.dart';
 import 'package:notedok/domain.dart';
+import 'package:notedok/formatting.dart';
 import 'package:notedok/messages.dart';
 import 'package:notedok/model.dart';
 import 'package:notedok/theme.dart';
@@ -314,7 +315,7 @@ class NoteView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return model.currentFileIdx == pageIdx
-        ? Markdown(data: "**${model.note.title}**\n\n${model.note.text}")
+        ? Markdown(data: WikiToHtmlFormatter().format(model.note.text))
         : Container();
   }
 }
