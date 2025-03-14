@@ -3,6 +3,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:notedok/domain.dart';
 import 'package:notedok/messages.dart';
+import 'package:notedok/parallel_executor.dart';
 import 'package:notedok/services/session_api.dart';
 
 // This is the only place where side-effects are allowed!
@@ -35,7 +36,6 @@ class SignOut implements Command {
   }
 }
 
-// TODO: consider sign-in explicitly the first time
 @immutable
 class RetrieveFileList implements Command {
   @override
@@ -43,6 +43,7 @@ class RetrieveFileList implements Command {
     final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
     if (session.isSignedIn) {
       var idToken = session.userPoolTokensResult.value.idToken;
+      await signIn(idToken.raw);
 
       // TODO: loop until retrieved all batches
       // TODO: make batch size 1000
@@ -69,19 +70,8 @@ class NoteListLoadFirstBatch implements Command {
     if (session.isSignedIn) {
       var idToken = session.userPoolTokensResult.value.idToken;
 
-      List<Note> notes = [];
       try {
-        // TODO: load in parallel with max concurrency of 6
-        for (var i = 0; i < files.length; i++) {
-          String fileName = files[i];
-          var text = await getFile(fileName, () => Future.value(idToken.raw));
-          var note = Note(
-            fileName,
-            fileName,
-            text,
-          ); // TODO: convert filename to title
-          notes.add(note);
-        }
+        List<Note> notes = await loadNotes(files, idToken.raw);
         dispatch(NoteListViewFirstBatchLoaded(notes));
       } catch (err) {
         // TODO: dispatch error
@@ -103,19 +93,8 @@ class NoteListLoadNextBatch implements Command {
     if (session.isSignedIn) {
       var idToken = session.userPoolTokensResult.value.idToken;
 
-      List<Note> notes = [];
       try {
-        // TODO: load in parallel with max concurrency of 6
-        for (var i = 0; i < files.length; i++) {
-          String fileName = files[i];
-          var text = await getFile(fileName, () => Future.value(idToken.raw));
-          var note = Note(
-            fileName,
-            fileName,
-            text,
-          ); // TODO: convert filename to title
-          notes.add(note);
-        }
+        List<Note> notes = await loadNotes(files, idToken.raw);
         dispatch(NoteListViewNextBatchLoaded(notes));
       } catch (err) {
         // TODO: dispatch error
@@ -123,6 +102,27 @@ class NoteListLoadNextBatch implements Command {
       }
     }
   }
+}
+
+Future<List<Note>> loadNotes(List<String> files, String idToken) async {
+  List<Note> notes = [];
+  final List<Future<String>> pendingRequests = [];
+  for (var i = 0; i < files.length; i++) {
+    String fileName = files[i];
+    pendingRequests.add(getFile(fileName, () => Future.value(idToken)));
+  }
+  var results = await Future.wait(pendingRequests);
+  for (var i = 0; i < files.length; i++) {
+    String fileName = files[i];
+    String text = results[i];
+    var note = Note(
+      fileName,
+      fileName,
+      text,
+    ); // TODO: convert filename to title
+    notes.add(note);
+  }
+  return notes;
 }
 
 @immutable
