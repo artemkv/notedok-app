@@ -1,6 +1,7 @@
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:notedok/conversions.dart';
 import 'package:notedok/domain.dart';
 import 'package:notedok/messages.dart';
 import 'package:notedok/services/session_api.dart';
@@ -114,11 +115,7 @@ Future<List<Note>> loadNotes(List<String> files, String idToken) async {
   for (var i = 0; i < files.length; i++) {
     String fileName = files[i];
     String text = results[i];
-    var note = Note(
-      fileName,
-      fileName,
-      text,
-    ); // TODO: convert filename to title
+    var note = Note(fileName, getTitleFromPath(fileName), text);
     notes.add(note);
   }
   return notes;

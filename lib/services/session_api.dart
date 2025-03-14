@@ -57,3 +57,37 @@ Future<dynamic> getFiles(
 Future<String> getFile(String fileName, Future<String> Function() getIdToken) {
   return callApi(() => rest.getFile(fileName, session), getIdToken);
 }
+
+Future<String> postFile(
+  String fileName,
+  String content,
+  Future<String> Function() getIdToken,
+) {
+  return callApi(() => rest.postFile(fileName, content, session), getIdToken);
+}
+
+Future<String> putFile(
+  String fileName,
+  String content,
+  Future<String> Function() getIdToken,
+) {
+  return callApi(() => rest.putFile(fileName, content, session), getIdToken);
+}
+
+Future<String> renameFile(
+  String fileName,
+  String newFileName,
+  Future<String> Function() getIdToken,
+) {
+  return callApi(
+    () => rest.renameFile(fileName, newFileName, session),
+    getIdToken,
+  );
+}
+
+Future<String> deleteFile(
+  String fileName,
+  Future<String> Function() getIdToken,
+) {
+  return callApi(() => rest.deleteFile(fileName, session), getIdToken);
+}

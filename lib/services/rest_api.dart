@@ -8,6 +8,9 @@ const BASE_URL = 'http://192.168.0.14:8100';
 // Cloud service:
 // const BASE_URL = 'https://notedok.artemkv.net:8100';
 
+const contentTypeJson = "application/json";
+const contentTypeText = "text/plain; charset=utf-8";
+
 class ApiException implements Exception {
   int statusCode;
   String message;
@@ -62,41 +65,8 @@ dynamic getData(http.Response response) {
   return dataResponse.data;
 }
 
-Future<dynamic> getJson(String endpoint, String session) async {
+Future<http.Response> get(String endpoint, String? session) async {
   var client = http.Client(); // TODO: re-use client if possible
-  var url = Uri.parse('$BASE_URL$endpoint');
-  var headers = {'x-session': session};
-
-  try {
-    var response = await client.get(url, headers: headers);
-    handleErrors(response);
-    return getData(response);
-  } finally {
-    client.close();
-  }
-}
-
-// TODO: can this be merged with getJson? the only difference is in return
-Future<String> getText(String endpoint, String session) async {
-  var client = http.Client(); // TODO: re-use client if possible
-  var url = Uri.parse('$BASE_URL$endpoint');
-  var headers = {'x-session': session};
-
-  try {
-    var response = await client.get(url, headers: headers);
-    handleErrors(response);
-    return response.body;
-  } finally {
-    client.close();
-  }
-}
-
-Future<dynamic> postJson(
-  String endpoint,
-  Object data, {
-  String? session,
-}) async {
-  var client = http.Client();
   var url = Uri.parse('$BASE_URL$endpoint');
   var headers = <String, String>{};
   if (session != null) {
@@ -104,20 +74,79 @@ Future<dynamic> postJson(
   }
 
   try {
-    var response = await client.post(
-      url,
-      body: jsonEncode(data),
-      headers: headers,
-    );
+    var response = await client.get(url, headers: headers);
     handleErrors(response);
-    return getData(response);
+    return response;
+  } finally {
+    client.close();
+  }
+}
+
+Future<http.Response> post(
+  String endpoint,
+  String content,
+  String contentType,
+  String? session,
+) async {
+  var client = http.Client();
+  var url = Uri.parse('$BASE_URL$endpoint');
+  var headers = <String, String>{"Content-Type": contentType};
+  if (session != null) {
+    headers['x-session'] = session;
+  }
+
+  try {
+    var response = await client.post(url, body: content, headers: headers);
+    handleErrors(response);
+    return response;
+  } finally {
+    client.close();
+  }
+}
+
+Future<http.Response> put(
+  String endpoint,
+  String content,
+  String contentType,
+  String? session,
+) async {
+  var client = http.Client();
+  var url = Uri.parse('$BASE_URL$endpoint');
+  var headers = <String, String>{"Content-Type": contentType};
+  if (session != null) {
+    headers['x-session'] = session;
+  }
+
+  try {
+    var response = await client.put(url, body: content, headers: headers);
+    handleErrors(response);
+    return response;
+  } finally {
+    client.close();
+  }
+}
+
+Future<http.Response> delete(String endpoint, String? session) async {
+  var client = http.Client(); // TODO: re-use client if possible
+  var url = Uri.parse('$BASE_URL$endpoint');
+  var headers = <String, String>{};
+  if (session != null) {
+    headers['x-session'] = session;
+  }
+
+  try {
+    var response = await client.delete(url, headers: headers);
+    handleErrors(response);
+    return response;
   } finally {
     client.close();
   }
 }
 
 Future<dynamic> signIn(String idToken) async {
-  return await postJson('/signin', {'id_token': idToken});
+  var body = {'id_token': idToken};
+  var response = await post('/signin', jsonEncode(body), contentTypeJson, null);
+  return getData(response);
 }
 
 Future<dynamic> getFiles(
@@ -125,13 +154,61 @@ Future<dynamic> getFiles(
   String continuationToken,
   String session,
 ) async {
-  return await getJson(
+  var response = await get(
     '/files?pageSize=$pageSize&continuationToken=$continuationToken',
     session,
   );
+  return getData(response);
 }
 
 Future<String> getFile(String fileName, String session) async {
   String encodedFileName = Uri.encodeComponent(fileName);
-  return await getText('/files/$encodedFileName', session);
+  var response = await get('/files/$encodedFileName', session);
+  return response.body;
+}
+
+Future<String> postFile(String fileName, String content, String session) async {
+  String encodedFileName = Uri.encodeComponent(fileName);
+  var response = await post(
+    '/files/$encodedFileName',
+    content,
+    contentTypeText,
+    session,
+  );
+  return response.body;
+}
+
+Future<String> putFile(String fileName, String content, String session) async {
+  String encodedFileName = Uri.encodeComponent(fileName);
+  var response = await put(
+    '/files/$encodedFileName',
+    content,
+    contentTypeText,
+    session,
+  );
+  return response.body;
+}
+
+Future<String> renameFile(
+  String fileName,
+  String newFileName,
+  String session,
+) async {
+  String encodedFileName = Uri.encodeComponent(fileName);
+  String encodedNewFileName = Uri.encodeComponent(newFileName);
+  var body = {'fileName': encodedFileName, 'newFileName': encodedNewFileName};
+
+  var response = await post(
+    '/rename',
+    jsonEncode(body),
+    contentTypeJson,
+    session,
+  );
+  return response.body; // actually ignored
+}
+
+Future<String> deleteFile(String fileName, String session) async {
+  String encodedFileName = Uri.encodeComponent(fileName);
+  var response = await delete('/files/$encodedFileName', session);
+  return response.body; // actually ignored
 }

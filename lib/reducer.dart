@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notedok/commands.dart';
+import 'package:notedok/conversions.dart';
 import 'package:notedok/domain.dart';
 import 'package:notedok/messages.dart';
 import 'package:notedok/model.dart';
@@ -122,9 +123,9 @@ ModelAndCommand reduce(Model model, Message message) {
             model.currentFileIdx,
             Note(
               message.fileName,
-              message.fileName,
+              getTitleFromPath(message.fileName),
               message.text,
-            ), // TODO: filename to title
+            ),
           ),
         );
       }

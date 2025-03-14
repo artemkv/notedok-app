@@ -1,6 +1,6 @@
 Everywhere:
 - filter on retrieved files
-- covert filenames to titles
+- --covert filenames to titles--
 
 List view:
 - --swipe down to reload--
@@ -22,6 +22,9 @@ Editor:
 
 Search:
 - when submitted, re-load with filter
+
+Delete note:
+- TODO:
 
 Optimizations:
 - --load all notes in a batch in parallel--
