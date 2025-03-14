@@ -5,17 +5,20 @@ Everywhere:
 List view:
 - --swipe down to reload--
 - --load more on scroll down--
+- --new note button--
 - try extracting first 5 lines and rendering as markdown
-- new note button
 - show error if cannot load
 
 Page view:
-- convert to markdown
-- render markdown
-- edit note button
+- --convert to markdown--
+- --render markdown--
+- --edit note button--
 - --show counter--
 - follow links
 - show error if cannot load
+
+Editor:
+- TODO
 
 Search:
 - when submitted, re-load with filter
