@@ -3,7 +3,6 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:notedok/domain.dart';
 import 'package:notedok/messages.dart';
-import 'package:notedok/parallel_executor.dart';
 import 'package:notedok/services/session_api.dart';
 
 // This is the only place where side-effects are allowed!
@@ -144,6 +143,47 @@ class LoadNoteContent implements Command {
       } catch (err) {
         dispatch(NotePageViewNoteContentLoadingFailed()); // TODO: pass error
       }
+    }
+  }
+}
+
+@immutable
+class SaveNewNote implements Command {
+  final String title;
+  final String text;
+
+  const SaveNewNote(this.title, this.text);
+
+  @override
+  void execute(void Function(Message) dispatch) async {
+    final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+    if (session.isSignedIn) {
+      var idToken = session.userPoolTokensResult.value.idToken;
+
+      print("*** TITLE: $title");
+      print("*** TEXT: $text");
+
+      dispatch(NewNoteSaved());
+    }
+  }
+}
+
+@immutable
+class SaveNote implements Command {
+  final String title;
+  final String text;
+  final String oldTitle;
+  final String oldText;
+
+  const SaveNote(this.title, this.text, this.oldTitle, this.oldText);
+
+  @override
+  void execute(void Function(Message) dispatch) async {
+    final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+    if (session.isSignedIn) {
+      var idToken = session.userPoolTokensResult.value.idToken;
+
+      dispatch(NoteSaved());
     }
   }
 }

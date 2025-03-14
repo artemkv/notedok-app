@@ -70,17 +70,41 @@ class NotePageViewNoteContentLoadingFailed implements Message {
 // TODO: continue with this
 
 @immutable
-class CreateNewNote implements Message {}
+class CreateNewNoteRequested implements Message {}
 
 @immutable
-class CancelNewNoteCreation implements Message {}
+class NewNoteCreationCanceled implements Message {}
 
 @immutable
-class SaveNewNote implements Message {}
+class SaveNewNoteRequested implements Message {
+  final String title;
+  final String text;
+
+  const SaveNewNoteRequested(this.title, this.text);
+}
 
 @immutable
-class EditNote implements Message {
+class NewNoteSaved implements Message {}
+
+@immutable
+class EditNoteRequested implements Message {
   final Note note;
 
-  const EditNote(this.note);
+  const EditNoteRequested(this.note);
 }
+
+@immutable
+class NoteEditingCanceled implements Message {}
+
+@immutable
+class SaveNoteRequested implements Message {
+  final String title;
+  final String text;
+  final String oldTitle;
+  final String oldText;
+
+  const SaveNoteRequested(this.title, this.text, this.oldTitle, this.oldText);
+}
+
+@immutable
+class NoteSaved implements Message {}

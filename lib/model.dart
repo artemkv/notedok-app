@@ -112,7 +112,15 @@ class NotePageViewNoteLoadingModel extends Model {
 
 @immutable
 class NoteEditorModel extends Model {
-  final Note note;
+  final String title;
+  final String text;
+  final bool isNew;
 
-  const NoteEditorModel(this.note);
+  const NoteEditorModel(this.title, this.text, this.isNew);
 }
+
+@immutable
+class SavingNewNoteModel extends Model {}
+
+@immutable
+class SavingNoteModel extends Model {}

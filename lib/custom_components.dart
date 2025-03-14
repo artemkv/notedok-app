@@ -270,8 +270,8 @@ class _NoteEditorState extends State<NoteEditor> {
   @override
   void initState() {
     super.initState();
-    _titleController.text = widget.model.note.title;
-    _textController.text = widget.model.note.text;
+    _titleController.text = widget.model.title;
+    _textController.text = widget.model.text;
   }
 
   @override
@@ -286,13 +286,44 @@ class _NoteEditorState extends State<NoteEditor> {
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
-        title: const Text('New note'), // TODO:
+        title:
+            widget.model.isNew
+                ? Text(
+                  'New note',
+                  style: GoogleFonts.openSans(
+                    textStyle: TextStyle(color: Colors.white),
+                    fontSize: textFontSize,
+                  ),
+                )
+                : Text(
+                  'Edit note',
+                  style: GoogleFonts.openSans(
+                    textStyle: TextStyle(color: Colors.white),
+                    fontSize: textFontSize,
+                  ),
+                ),
         actions: [
           IconButton(
             icon: const Icon(Icons.check),
             tooltip: 'Save',
             onPressed: () {
-              widget.dispatch(SaveNewNote()); // TODO: or modified note
+              if (widget.model.isNew) {
+                widget.dispatch(
+                  SaveNewNoteRequested(
+                    _titleController.text,
+                    _textController.text,
+                  ),
+                );
+              } else {
+                widget.dispatch(
+                  SaveNoteRequested(
+                    _titleController.text,
+                    _textController.text,
+                    widget.model.title,
+                    widget.model.text,
+                  ),
+                );
+              }
             },
           ),
         ],
@@ -302,7 +333,11 @@ class _NoteEditorState extends State<NoteEditor> {
       body: PopScope(
         canPop: false,
         onPopInvokedWithResult: (didPop, result) async {
-          widget.dispatch(CancelNewNoteCreation()); // TODO: or editing
+          if (widget.model.isNew) {
+            widget.dispatch(NewNoteCreationCanceled());
+          } else {
+            widget.dispatch(NoteEditingCanceled());
+          }
         },
         child: Column(
           children: [

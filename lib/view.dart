@@ -39,6 +39,9 @@ Widget home(
   if (model is NoteEditorModel) {
     return NoteEditor(model: model, dispatch: dispatch);
   }
+  if (model is SavingNewNoteModel) {
+    return savingNote(context, dispatch);
+  }
 
   return unknownModel(model);
 }
@@ -166,7 +169,7 @@ Widget noteListView(
     backgroundColor: Colors.white,
     floatingActionButton: (FloatingActionButton(
       onPressed: () {
-        dispatch(CreateNewNote());
+        dispatch(CreateNewNoteRequested());
       },
       child: const Icon(Icons.add),
     )),
@@ -244,7 +247,7 @@ AppBar notePageViewAppBar(
         tooltip: 'Edit',
         onPressed: () {
           if (note != null) {
-            dispatch(EditNote(note));
+            dispatch(EditNoteRequested(note));
           }
         },
       ),
@@ -321,4 +324,13 @@ class NoteView extends StatelessWidget {
         )
         : Container();
   }
+}
+
+Widget savingNote(BuildContext context, void Function(Message) dispatch) {
+  return Scaffold(
+    appBar: defaultAppBar(context),
+    drawer: drawer(context, dispatch),
+    body: Center(child: spinner()),
+    backgroundColor: Colors.white,
+  );
 }

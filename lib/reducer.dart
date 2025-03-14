@@ -131,19 +131,39 @@ ModelAndCommand reduce(Model model, Message message) {
     }
   }
 
-  if (message is CreateNewNote) {
-    var note = Note("", "", ""); // TODO:
-    return ModelAndCommand.justModel(NoteEditorModel(note));
+  if (message is CreateNewNoteRequested) {
+    return ModelAndCommand.justModel(NoteEditorModel("", "", true));
   }
-  if (message is CancelNewNoteCreation) {
+  if (message is NewNoteCreationCanceled) {
     return ModelAndCommand(RetrievingFileListModel(), RetrieveFileList());
   }
-  if (message is SaveNewNote) {
-    // TODO: this is now just re-loading the list
+  if (message is SaveNewNoteRequested) {
+    return ModelAndCommand(
+      SavingNewNoteModel(),
+      SaveNewNote(message.title, message.text),
+    );
+  }
+  if (message is NewNoteSaved) {
     return ModelAndCommand(RetrievingFileListModel(), RetrieveFileList());
   }
-  if (message is EditNote) {
-    return ModelAndCommand.justModel(NoteEditorModel(message.note));
+
+  if (message is EditNoteRequested) {
+    return ModelAndCommand.justModel(
+      NoteEditorModel(message.note.title, message.note.text, false),
+    );
+  }
+  if (message is NoteEditingCanceled) {
+    // TODO:
+  }
+  if (message is SaveNoteRequested) {
+    return ModelAndCommand(
+      SavingNoteModel(),
+      SaveNote(message.title, message.text, message.oldTitle, message.oldText),
+    );
+  }
+  if (message is NoteSaved) {
+    // TODO: should return to page view
+    return ModelAndCommand(RetrievingFileListModel(), RetrieveFileList());
   }
 
   return ModelAndCommand.justModel(model);

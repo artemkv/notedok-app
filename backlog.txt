@@ -18,7 +18,7 @@ Page view:
 - show error if cannot load
 
 Editor:
-- TODO
+- show error if cannot save
 
 Search:
 - when submitted, re-load with filter
