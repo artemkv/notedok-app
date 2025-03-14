@@ -315,7 +315,7 @@ class NoteView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return model.currentFileIdx == pageIdx
-        ? Markdown(data: WikiToHtmlFormatter().format(model.note.text))
+        ? Markdown(data: LegacyWikiToMdFormatter().format(model.note.text))
         : Container();
   }
 }

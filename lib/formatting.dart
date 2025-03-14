@@ -4,7 +4,7 @@ var whitespace = RegExp(r'^\s$');
 var newline = RegExp(r'^\n$');
 const quote = "&quot;";
 
-class WikiToHtmlFormatter {
+class LegacyWikiToMdFormatter {
   String _char = "";
   String _text = "";
   int _pos = -1;
@@ -20,19 +20,19 @@ class WikiToHtmlFormatter {
       _char = getCharAt(_text, _pos);
 
       if (_char == "*") {
-        tryWrap("*", "<b>", "</b>");
+        tryWrap("*", "**", "**");
         tryUl("*");
       } else if (_char == "_") {
-        tryWrap("_", "<i>", "</i>");
+        tryWrap("_", "*", "*");
       } else if (_char == "-") {
-        tryWrap("--", "<del>", "</del>");
+        tryWrap("--", "~~", "~~");
         tryUl("-");
       } else if (_char == "+") {
-        tryWrap("++", "<u>", "</u>");
+        tryWrap("++", "", "");
       } else if (_char == "^") {
-        tryWrap("^", "<sup>", "</sup>");
+        tryWrap("^", "^", "^");
       } else if (_char == "~") {
-        tryWrap("~", "<sub>", "</sub>");
+        tryWrap("~", "~", "~");
       } else if (_char == "{") {
         _tryEscaped();
         _tryCode();
@@ -121,7 +121,7 @@ class WikiToHtmlFormatter {
         if (_text.indexOf("<", _pos + 1) == -1 ||
             _text.indexOf("<", _pos + 1) > closingBracketPos) {
           String href = jsSubstring3(_text, _pos + 1, closingBracketPos);
-          String link = "<a href='$href' target='_blank'>$href</a>";
+          String link = "[$href]($href)";
           _text =
               jsSubstring3(_text, 0, _pos) +
               link +
@@ -151,7 +151,7 @@ class WikiToHtmlFormatter {
         _pos + codeTag.length,
         closingTagPos,
       );
-      String codeBlockFormatted = "<pre class='codeblock'>$codeBlock</pre>";
+      String codeBlockFormatted = "```$codeBlock```";
       _text =
           jsSubstring3(_text, 0, _pos) +
           codeBlockFormatted +
@@ -179,15 +179,13 @@ class WikiToHtmlFormatter {
         }
 
         String liText = jsSubstring3(_text, _pos + 2, eolPos);
-        String wrappedLiText = "<li>$liText</li>";
+        String wrappedLiText = "- $liText";
 
         if (!_listOpened) {
-          wrappedLiText = "<ul>$wrappedLiText";
           _listOpened = true;
         }
 
         if (jsSubstr(_text, eolPos + 1, liTag.length) != liTag) {
-          wrappedLiText = "$wrappedLiText</ul>";
           _listOpened = false;
         }
 
@@ -216,7 +214,7 @@ class WikiToHtmlFormatter {
 
           String hText = jsSubstring3(_text, _pos + hTag.length, eolPos);
           var headerLevel = i + 1;
-          String wrappedHText = "<h$headerLevel>$hText</h$headerLevel>";
+          String wrappedHText = "${"#" * headerLevel} $hText";
 
           _text =
               jsSubstring3(_text, 0, _pos) +
@@ -243,7 +241,7 @@ class WikiToHtmlFormatter {
           }
 
           String hText = jsSubstring3(_text, _pos + hTag.length, eolPos);
-          String wrappedHText = "<h$headerLevel>$hText</h$headerLevel>";
+          String wrappedHText = "${"#" * headerLevel} $hText";
 
           _text =
               jsSubstring3(_text, 0, _pos) +
