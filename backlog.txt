@@ -24,7 +24,7 @@ Search:
 - when submitted, re-load with filter
 
 Optimizations:
-- load up to 6 notes in parallel
+- --load all notes in a batch in parallel--
 - cache by etag
 
 Auto-suggest
