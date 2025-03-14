@@ -132,7 +132,9 @@ ModelAndCommand reduce(Model model, Message message) {
   }
 
   if (message is CreateNewNoteRequested) {
-    return ModelAndCommand.justModel(NoteEditorModel("", "", true));
+    return ModelAndCommand.justModel(
+      NoteEditorModel("", "", true, NotePageViewSavedState.empty()),
+    );
   }
   if (message is NewNoteCreationCanceled) {
     return ModelAndCommand(RetrievingFileListModel(), RetrieveFileList());
@@ -148,22 +150,61 @@ ModelAndCommand reduce(Model model, Message message) {
   }
 
   if (message is EditNoteRequested) {
-    return ModelAndCommand.justModel(
-      NoteEditorModel(message.note.title, message.note.text, false),
-    );
+    if (model is NotePageViewModel) {
+      return ModelAndCommand.justModel(
+        NoteEditorModel(
+          message.note.title,
+          message.note.text,
+          false,
+          NotePageViewSavedState(model.files, model.currentFileIdx, model.note),
+        ),
+      );
+    }
+    return ModelAndCommand.justModel(model);
   }
   if (message is NoteEditingCanceled) {
-    // TODO:
+    if (model is NoteEditorModel) {
+      return ModelAndCommand.justModel(
+        NotePageViewModel(
+          model.pageViewSavedState.files,
+          model.pageViewSavedState.currentFileIdx,
+          model.pageViewSavedState.note,
+        ),
+      );
+    }
+    return ModelAndCommand.justModel(model);
   }
   if (message is SaveNoteRequested) {
-    return ModelAndCommand(
-      SavingNoteModel(),
-      SaveNote(message.title, message.text, message.oldTitle, message.oldText),
-    );
+    if (model is NoteEditorModel) {
+      return ModelAndCommand(
+        SavingNoteModel(
+          NotePageViewSavedState(
+            model.pageViewSavedState.files,
+            model.pageViewSavedState.currentFileIdx,
+            model.pageViewSavedState.note,
+          ),
+        ),
+        SaveNote(
+          message.title,
+          message.text,
+          message.oldTitle,
+          message.oldText,
+        ),
+      );
+    }
+    return ModelAndCommand.justModel(model);
   }
   if (message is NoteSaved) {
-    // TODO: should return to page view
-    return ModelAndCommand(RetrievingFileListModel(), RetrieveFileList());
+    if (model is SavingNoteModel) {
+      return ModelAndCommand.justModel(
+        NotePageViewModel(
+          model.pageViewSavedState.files,
+          model.pageViewSavedState.currentFileIdx,
+          message.note,
+        ),
+      );
+    }
+    return ModelAndCommand.justModel(model);
   }
 
   return ModelAndCommand.justModel(model);

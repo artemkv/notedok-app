@@ -183,7 +183,8 @@ class SaveNote implements Command {
     if (session.isSignedIn) {
       var idToken = session.userPoolTokensResult.value.idToken;
 
-      dispatch(NoteSaved());
+      // TODO: actually save
+      dispatch(NoteSaved(Note(title, title, text)));
     }
   }
 }

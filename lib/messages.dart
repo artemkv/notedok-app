@@ -107,4 +107,8 @@ class SaveNoteRequested implements Message {
 }
 
 @immutable
-class NoteSaved implements Message {}
+class NoteSaved implements Message {
+  final Note note;
+
+  const NoteSaved(this.note);
+}

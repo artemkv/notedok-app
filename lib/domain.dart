@@ -36,6 +36,8 @@ class Note {
 
   const Note(this.fileName, this.title, this.text);
 
+  const Note.empty() : fileName = "", title = "", text = "";
+
   @override
   bool operator ==(Object other) {
     return other is Note &&

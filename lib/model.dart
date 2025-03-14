@@ -111,16 +111,40 @@ class NotePageViewNoteLoadingModel extends Model {
 }
 
 @immutable
+class NotePageViewSavedState {
+  final List<String> files;
+  final int currentFileIdx;
+  final Note note;
+
+  const NotePageViewSavedState(this.files, this.currentFileIdx, this.note);
+
+  NotePageViewSavedState.empty()
+    : files = [],
+      currentFileIdx = 0,
+      note = Note.empty();
+}
+
+@immutable
 class NoteEditorModel extends Model {
   final String title;
   final String text;
   final bool isNew;
+  final NotePageViewSavedState pageViewSavedState;
 
-  const NoteEditorModel(this.title, this.text, this.isNew);
+  const NoteEditorModel(
+    this.title,
+    this.text,
+    this.isNew,
+    this.pageViewSavedState,
+  );
 }
 
 @immutable
 class SavingNewNoteModel extends Model {}
 
 @immutable
-class SavingNoteModel extends Model {}
+class SavingNoteModel extends Model {
+  final NotePageViewSavedState pageViewSavedState;
+
+  const SavingNoteModel(this.pageViewSavedState);
+}
