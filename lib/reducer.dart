@@ -134,7 +134,7 @@ ModelAndCommand reduce(Model model, Message message) {
 
   if (message is CreateNewNoteRequested) {
     return ModelAndCommand.justModel(
-      NoteEditorModel("", "", true, NotePageViewSavedState.empty()),
+      NoteEditorModel("", "", "", true, NotePageViewSavedState.empty()),
     );
   }
   if (message is NewNoteCreationCanceled) {
@@ -154,6 +154,7 @@ ModelAndCommand reduce(Model model, Message message) {
     if (model is NotePageViewModel) {
       return ModelAndCommand.justModel(
         NoteEditorModel(
+          message.note.fileName,
           message.note.title,
           message.note.text,
           false,
@@ -186,6 +187,7 @@ ModelAndCommand reduce(Model model, Message message) {
           ),
         ),
         SaveNote(
+          model.fileName,
           message.title,
           message.text,
           message.oldTitle,

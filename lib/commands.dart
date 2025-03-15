@@ -176,9 +176,11 @@ class SaveNewNote implements Command {
             await putFile(path, text, () => Future.value(idToken.raw));
           } catch (err) {
             // TODO: dispatch failed
+            // TODO: think about retry carefully
           }
         } else {
           // TODO: dispatch failed
+          // TODO: think about retry carefully
         }
       }
 
@@ -189,12 +191,13 @@ class SaveNewNote implements Command {
 
 @immutable
 class SaveNote implements Command {
+  final String path;
   final String title;
   final String text;
   final String oldTitle;
   final String oldText;
 
-  const SaveNote(this.title, this.text, this.oldTitle, this.oldText);
+  const SaveNote(this.path, this.title, this.text, this.oldTitle, this.oldText);
 
   @override
   void execute(void Function(Message) dispatch) async {
@@ -202,8 +205,42 @@ class SaveNote implements Command {
     if (session.isSignedIn) {
       var idToken = session.userPoolTokensResult.value.idToken;
 
-      // TODO: actually save
-      dispatch(NoteSaved(Note(title, title, text)));
+      // First save text
+      try {
+        await putFile(path, text, () => Future.value(idToken.raw));
+      } catch (err) {
+        // TODO: dispatch failed
+        // TODO: think about retry carefully
+      }
+
+      // Now rename, if needed
+      if (title != oldTitle) {
+        // First time try with path derived from title
+        // Unless title is empty, in which case we immediately ask for a unique one
+        String newPath = generatePathFromTitle(title, title.isEmpty);
+
+        try {
+          await renameFile(path, newPath, () => Future.value(idToken.raw));
+          dispatch(NoteSaved(Note(newPath, title, text)));
+        } catch (err) {
+          if (err is RestApiException && err.statusCode == 409) {
+            // Regenerate path from title, this time focing uniqueness
+            newPath = generatePathFromTitle(title, true);
+            try {
+              await renameFile(path, newPath, () => Future.value(idToken.raw));
+              dispatch(NoteSaved(Note(newPath, title, text)));
+            } catch (err) {
+              // TODO: dispatch failed
+              // TODO: think about retry carefully
+            }
+          } else {
+            // TODO: dispatch failed
+            // TODO: think about retry carefully
+          }
+        }
+      } else {
+        dispatch(NoteSaved(Note(path, title, text)));
+      }
     }
   }
 }

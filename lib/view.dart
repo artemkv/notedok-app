@@ -42,6 +42,9 @@ Widget home(
   if (model is SavingNewNoteModel) {
     return savingNote(context, dispatch);
   }
+  if (model is SavingNoteModel) {
+    return savingNote(context, dispatch);
+  }
 
   return unknownModel(model);
 }

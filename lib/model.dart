@@ -126,12 +126,14 @@ class NotePageViewSavedState {
 
 @immutable
 class NoteEditorModel extends Model {
+  final String fileName;
   final String title;
   final String text;
   final bool isNew;
   final NotePageViewSavedState pageViewSavedState;
 
   const NoteEditorModel(
+    this.fileName,
     this.title,
     this.text,
     this.isNew,
