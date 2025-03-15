@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:notedok/conversions.dart';
 import 'package:notedok/domain.dart';
 import 'package:notedok/messages.dart';
+import 'package:notedok/services/rest_api.dart' show RestApiException;
 import 'package:notedok/services/session_api.dart';
 
 // This is the only place where side-effects are allowed!
@@ -157,8 +158,29 @@ class SaveNewNote implements Command {
     if (session.isSignedIn) {
       var idToken = session.userPoolTokensResult.value.idToken;
 
-      print("*** TITLE: $title");
-      print("*** TEXT: $text");
+      String path;
+      if (title.isEmpty) {
+        path = generatePathFromTitle("", true);
+      } else {
+        path = generatePathFromTitle(title, false);
+      }
+
+      try {
+        // Don't overwrite, in case not unique
+        await postFile(path, text, () => Future.value(idToken.raw));
+      } catch (err) {
+        if (err is RestApiException && err.statusCode == 409) {
+          // Regenerate path from title, this time enfocing uniqueness
+          path = generatePathFromTitle(title, true);
+          try {
+            await putFile(path, text, () => Future.value(idToken.raw));
+          } catch (err) {
+            // TODO: dispatch failed
+          }
+        } else {
+          // TODO: dispatch failed
+        }
+      }
 
       dispatch(NewNoteSaved());
     }

@@ -11,11 +11,11 @@ const BASE_URL = 'http://192.168.0.14:8100';
 const contentTypeJson = "application/json";
 const contentTypeText = "text/plain; charset=utf-8";
 
-class ApiException implements Exception {
+class RestApiException implements Exception {
   int statusCode;
   String message;
 
-  ApiException(this.statusCode, this.message);
+  RestApiException(this.statusCode, this.message);
 
   @override
   String toString() {
@@ -54,7 +54,7 @@ void handleErrors(http.Response response) {
     ApiResponseError errorResponse = ApiResponseError.fromJson(
       jsonDecode(response.body),
     );
-    throw ApiException(response.statusCode, errorResponse.error);
+    throw RestApiException(response.statusCode, errorResponse.error);
   }
 }
 

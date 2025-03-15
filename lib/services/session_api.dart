@@ -32,7 +32,7 @@ Future<T> callApi<T>(
   try {
     // print(">> Has session, go to the api directly");
     return await f();
-  } on rest.ApiException catch (e) {
+  } on rest.RestApiException catch (e) {
     if (e.statusCode == 401) {
       // print(">> Oops, expired, will sign in again and retry");
       var idToken = await getIdToken();

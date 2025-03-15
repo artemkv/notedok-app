@@ -18,6 +18,8 @@ Page view:
 - show error if cannot load
 
 Editor:
+- --save new note--
+- save existing note, and rename if needed
 - show error if cannot save
 
 Search:
