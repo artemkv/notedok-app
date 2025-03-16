@@ -24,9 +24,9 @@ Editor:
 
 Search:
 - --when submitted, re-load with filter--
-- when canceling new note creation, should get back to filtered list (see what's done with page view saved state)
-- app bar does not show the search string after the search is done
-- search bar does not pick the current search string either
+- --when canceling new note creation, should get back to filtered list (see what's done with page view saved state)--
+- --app bar does not show the search string after the search is done--
+- --search bar does not pick the current search string either--
 
 Delete note:
 - TODO:
