@@ -10,6 +10,13 @@ abstract class Message {}
 class SignOutRequested implements Message {}
 
 @immutable
+class SearchSubmitted implements Message {
+  final String searchString;
+
+  const SearchSubmitted(this.searchString);
+}
+
+@immutable
 class RetrieveFileListSuccess implements Message {
   final List<String> files;
 

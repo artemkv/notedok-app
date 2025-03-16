@@ -8,7 +8,9 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class SearchableAppBar extends StatefulWidget implements PreferredSizeWidget {
-  const SearchableAppBar({super.key});
+  final void Function(Message) dispatch;
+
+  const SearchableAppBar({super.key, required this.dispatch});
 
   @override
   State<SearchableAppBar> createState() => _SearchableAppBarState();
@@ -67,7 +69,7 @@ class _SearchableAppBarState extends State<SearchableAppBar> {
             });
           },
           onSubmitted: (value) {
-            // TODO: search
+            widget.dispatch(SearchSubmitted(_controller.text));
           },
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,

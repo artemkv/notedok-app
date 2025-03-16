@@ -9,7 +9,7 @@ abstract class Model {
   const Model();
 
   static Model getInitialModel() {
-    return RetrievingFileListModel();
+    return RetrievingFileListModel("");
   }
 }
 
@@ -17,23 +17,38 @@ abstract class Model {
 class SignOutInProgressModel extends Model {}
 
 @immutable
-class RetrievingFileListModel extends Model {}
+class RetrievingFileListModel extends Model {
+  final String searchString;
+
+  const RetrievingFileListModel(this.searchString);
+}
 
 @immutable
 class FileListRetrievedModel extends Model {
+  final String searchString;
   final List<String> files;
   final List<String> unprocessedFiles;
 
-  const FileListRetrievedModel(this.files, this.unprocessedFiles);
+  const FileListRetrievedModel(
+    this.searchString,
+    this.files,
+    this.unprocessedFiles,
+  );
 }
 
 @immutable
 class NoteListViewModel extends Model {
+  final String searchString;
   final List<String> files;
   final List<String> unprocessedFiles;
   final List<NoteListItem> items;
 
-  const NoteListViewModel(this.files, this.unprocessedFiles, this.items);
+  const NoteListViewModel(
+    this.searchString,
+    this.files,
+    this.unprocessedFiles,
+    this.items,
+  );
 }
 
 @immutable
@@ -95,31 +110,49 @@ class NoteListItemRetryLoadMore extends NoteListItem {
 
 @immutable
 class NotePageViewModel extends Model {
+  final String searchString;
   final List<String> files;
   final int currentFileIdx;
   final Note note;
 
-  const NotePageViewModel(this.files, this.currentFileIdx, this.note);
+  const NotePageViewModel(
+    this.searchString,
+    this.files,
+    this.currentFileIdx,
+    this.note,
+  );
 }
 
 @immutable
 class NotePageViewNoteLoadingModel extends Model {
+  final String searchString;
   final List<String> files;
   final int currentFileIdx;
 
-  const NotePageViewNoteLoadingModel(this.files, this.currentFileIdx);
+  const NotePageViewNoteLoadingModel(
+    this.searchString,
+    this.files,
+    this.currentFileIdx,
+  );
 }
 
 @immutable
 class NotePageViewSavedState {
+  final String searchString;
   final List<String> files;
   final int currentFileIdx;
   final Note note;
 
-  const NotePageViewSavedState(this.files, this.currentFileIdx, this.note);
+  const NotePageViewSavedState(
+    this.searchString,
+    this.files,
+    this.currentFileIdx,
+    this.note,
+  );
 
   NotePageViewSavedState.empty()
-    : files = [],
+    : searchString = "",
+      files = [],
       currentFileIdx = 0,
       note = Note.empty();
 }

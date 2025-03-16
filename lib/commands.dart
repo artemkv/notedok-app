@@ -18,7 +18,7 @@ abstract class Command {
   }
 
   static Command getInitialCommand() {
-    return RetrieveFileList();
+    return RetrieveFileList("");
   }
 }
 
@@ -40,8 +40,9 @@ class SignOut implements Command {
 @immutable
 class RetrieveFileList implements Command {
   final int pageSize = 1000;
+  final String searchString;
 
-  final String searchString = "";
+  const RetrieveFileList(this.searchString);
 
   @override
   void execute(void Function(Message) dispatch) async {

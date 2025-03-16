@@ -160,7 +160,7 @@ Widget noteListView(
   void Function(Message) dispatch,
 ) {
   return Scaffold(
-    appBar: SearchableAppBar(),
+    appBar: SearchableAppBar(dispatch: dispatch),
     drawer: drawer(context, dispatch),
     body: RefreshIndicator(
       onRefresh: () {

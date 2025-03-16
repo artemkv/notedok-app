@@ -23,14 +23,24 @@ ModelAndCommand reduce(Model model, Message message) {
     return ModelAndCommand(SignOutInProgressModel(), SignOut());
   }
 
-  if (message is RetrieveFileListSuccess) {
+  if (message is SearchSubmitted) {
     return ModelAndCommand(
-      FileListRetrievedModel(
-        message.files,
-        message.files.skip(noteBatchSize).toList(),
-      ),
-      NoteListLoadFirstBatch(message.files.take(noteBatchSize).toList()),
+      RetrievingFileListModel(message.searchString),
+      RetrieveFileList(message.searchString),
     );
+  }
+
+  if (message is RetrieveFileListSuccess) {
+    if (model is RetrievingFileListModel) {
+      return ModelAndCommand(
+        FileListRetrievedModel(
+          model.searchString,
+          message.files,
+          message.files.skip(noteBatchSize).toList(),
+        ),
+        NoteListLoadFirstBatch(message.files.take(noteBatchSize).toList()),
+      );
+    }
   }
   if (message is NoteListViewFirstBatchLoaded) {
     if (model is FileListRetrievedModel) {
@@ -42,10 +52,14 @@ ModelAndCommand reduce(Model model, Message message) {
         listItems.add(NoteListItemLoadMoreTrigger());
       }
       return ModelAndCommand.justModel(
-        NoteListViewModel(model.files, model.unprocessedFiles, listItems),
+        NoteListViewModel(
+          model.searchString,
+          model.files,
+          model.unprocessedFiles,
+          listItems,
+        ),
       );
     }
-    return ModelAndCommand.justModel(model);
   }
   if (message is NoteListViewNextBatchRequested) {
     if (model is NoteListViewModel) {
@@ -57,6 +71,7 @@ ModelAndCommand reduce(Model model, Message message) {
 
       return ModelAndCommand(
         NoteListViewModel(
+          model.searchString,
           model.files,
           model.unprocessedFiles.skip(noteBatchSize).toList(),
           updatedItems,
@@ -66,7 +81,6 @@ ModelAndCommand reduce(Model model, Message message) {
         ),
       );
     }
-    return ModelAndCommand.justModel(model);
   }
   if (message is NoteListViewNextBatchLoaded) {
     if (model is NoteListViewModel) {
@@ -85,31 +99,53 @@ ModelAndCommand reduce(Model model, Message message) {
       }
 
       return ModelAndCommand.justModel(
-        NoteListViewModel(model.files, model.unprocessedFiles, updatedItems),
+        NoteListViewModel(
+          model.searchString,
+          model.files,
+          model.unprocessedFiles,
+          updatedItems,
+        ),
       );
     }
-    return ModelAndCommand.justModel(model);
   }
   if (message is NoteListViewReloadRequested) {
-    return ModelAndCommand(RetrievingFileListModel(), RetrieveFileList());
+    if (model is NoteListViewModel) {
+      return ModelAndCommand(
+        RetrievingFileListModel(model.searchString),
+        RetrieveFileList(model.searchString),
+      );
+    }
   }
 
   if (message is NoteListViewMoveToPageView) {
     if (model is NoteListViewModel) {
       return ModelAndCommand.justModel(
-        NotePageViewModel(model.files, message.noteIdx, message.note),
+        NotePageViewModel(
+          model.searchString,
+          model.files,
+          message.noteIdx,
+          message.note,
+        ),
       );
     }
-    return ModelAndCommand.justModel(model);
   }
   if (message is NotePageViewMoveToListView) {
-    return ModelAndCommand(RetrievingFileListModel(), RetrieveFileList());
+    if (model is NotePageViewModel) {
+      return ModelAndCommand(
+        RetrievingFileListModel(model.searchString),
+        RetrieveFileList(model.searchString),
+      );
+    }
   }
 
   if (message is NotePageViewMovedToNote) {
     if (model is NotePageViewModel) {
       return ModelAndCommand(
-        NotePageViewNoteLoadingModel(model.files, message.noteIdx),
+        NotePageViewNoteLoadingModel(
+          model.searchString,
+          model.files,
+          message.noteIdx,
+        ),
         LoadNoteContent(model.files[message.noteIdx]),
       );
     }
@@ -119,6 +155,7 @@ ModelAndCommand reduce(Model model, Message message) {
       if (model.files[model.currentFileIdx] == message.fileName) {
         return ModelAndCommand.justModel(
           NotePageViewModel(
+            model.searchString,
             model.files,
             model.currentFileIdx,
             Note(
@@ -138,7 +175,8 @@ ModelAndCommand reduce(Model model, Message message) {
     );
   }
   if (message is NewNoteCreationCanceled) {
-    return ModelAndCommand(RetrievingFileListModel(), RetrieveFileList());
+    // TODO: should we get back to the search results?
+    return ModelAndCommand(RetrievingFileListModel(""), RetrieveFileList(""));
   }
   if (message is SaveNewNoteRequested) {
     return ModelAndCommand(
@@ -147,7 +185,7 @@ ModelAndCommand reduce(Model model, Message message) {
     );
   }
   if (message is NewNoteSaved) {
-    return ModelAndCommand(RetrievingFileListModel(), RetrieveFileList());
+    return ModelAndCommand(RetrievingFileListModel(""), RetrieveFileList(""));
   }
 
   if (message is EditNoteRequested) {
@@ -158,29 +196,34 @@ ModelAndCommand reduce(Model model, Message message) {
           message.note.title,
           message.note.text,
           false,
-          NotePageViewSavedState(model.files, model.currentFileIdx, model.note),
+          NotePageViewSavedState(
+            model.searchString,
+            model.files,
+            model.currentFileIdx,
+            model.note,
+          ),
         ),
       );
     }
-    return ModelAndCommand.justModel(model);
   }
   if (message is NoteEditingCanceled) {
     if (model is NoteEditorModel) {
       return ModelAndCommand.justModel(
         NotePageViewModel(
+          model.pageViewSavedState.searchString,
           model.pageViewSavedState.files,
           model.pageViewSavedState.currentFileIdx,
           model.pageViewSavedState.note,
         ),
       );
     }
-    return ModelAndCommand.justModel(model);
   }
   if (message is SaveNoteRequested) {
     if (model is NoteEditorModel) {
       return ModelAndCommand(
         SavingNoteModel(
           NotePageViewSavedState(
+            model.pageViewSavedState.searchString,
             model.pageViewSavedState.files,
             model.pageViewSavedState.currentFileIdx,
             model.pageViewSavedState.note,
@@ -195,19 +238,18 @@ ModelAndCommand reduce(Model model, Message message) {
         ),
       );
     }
-    return ModelAndCommand.justModel(model);
   }
   if (message is NoteSaved) {
     if (model is SavingNoteModel) {
       return ModelAndCommand.justModel(
         NotePageViewModel(
+          model.pageViewSavedState.searchString,
           model.pageViewSavedState.files,
           model.pageViewSavedState.currentFileIdx,
           message.note,
         ),
       );
     }
-    return ModelAndCommand.justModel(model);
   }
 
   return ModelAndCommand.justModel(model);
