@@ -49,6 +49,37 @@ class NoteListViewModel extends Model {
     this.unprocessedFiles,
     this.items,
   );
+
+  NoteListViewModel.restore(NoteListViewSavedState state)
+    : searchString = state.searchString,
+      files = state.files,
+      unprocessedFiles = state.unprocessedFiles,
+      items = state.items;
+
+  NoteListViewSavedState saveState() {
+    return NoteListViewSavedState(searchString, files, unprocessedFiles, items);
+  }
+}
+
+@immutable
+class NoteListViewSavedState {
+  final String searchString;
+  final List<String> files;
+  final List<String> unprocessedFiles;
+  final List<NoteListItem> items;
+
+  const NoteListViewSavedState(
+    this.searchString,
+    this.files,
+    this.unprocessedFiles,
+    this.items,
+  );
+
+  NoteListViewSavedState.empty()
+    : searchString = "",
+      files = [],
+      unprocessedFiles = [],
+      items = [];
 }
 
 @immutable
@@ -121,19 +152,16 @@ class NotePageViewModel extends Model {
     this.currentFileIdx,
     this.note,
   );
-}
 
-@immutable
-class NotePageViewNoteLoadingModel extends Model {
-  final String searchString;
-  final List<String> files;
-  final int currentFileIdx;
+  NotePageViewModel.restore(NotePageViewSavedState state)
+    : searchString = state.searchString,
+      files = state.files,
+      currentFileIdx = state.currentFileIdx,
+      note = state.note;
 
-  const NotePageViewNoteLoadingModel(
-    this.searchString,
-    this.files,
-    this.currentFileIdx,
-  );
+  NotePageViewSavedState saveState() {
+    return NotePageViewSavedState(searchString, files, currentFileIdx, note);
+  }
 }
 
 @immutable
@@ -158,11 +186,25 @@ class NotePageViewSavedState {
 }
 
 @immutable
+class NotePageViewNoteLoadingModel extends Model {
+  final String searchString;
+  final List<String> files;
+  final int currentFileIdx;
+
+  const NotePageViewNoteLoadingModel(
+    this.searchString,
+    this.files,
+    this.currentFileIdx,
+  );
+}
+
+@immutable
 class NoteEditorModel extends Model {
   final String fileName;
   final String title;
   final String text;
   final bool isNew;
+  final NoteListViewSavedState listViewSavedState;
   final NotePageViewSavedState pageViewSavedState;
 
   const NoteEditorModel(
@@ -170,6 +212,7 @@ class NoteEditorModel extends Model {
     this.title,
     this.text,
     this.isNew,
+    this.listViewSavedState,
     this.pageViewSavedState,
   );
 }

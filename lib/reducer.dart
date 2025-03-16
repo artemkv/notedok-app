@@ -170,13 +170,25 @@ ModelAndCommand reduce(Model model, Message message) {
   }
 
   if (message is CreateNewNoteRequested) {
-    return ModelAndCommand.justModel(
-      NoteEditorModel("", "", "", true, NotePageViewSavedState.empty()),
-    );
+    if (model is NoteListViewModel) {
+      return ModelAndCommand.justModel(
+        NoteEditorModel(
+          "",
+          "",
+          "",
+          true,
+          model.saveState(),
+          NotePageViewSavedState.empty(),
+        ),
+      );
+    }
   }
   if (message is NewNoteCreationCanceled) {
-    // TODO: should we get back to the search results?
-    return ModelAndCommand(RetrievingFileListModel(""), RetrieveFileList(""));
+    if (model is NoteEditorModel) {
+      return ModelAndCommand.justModel(
+        NoteListViewModel.restore(model.listViewSavedState),
+      );
+    }
   }
   if (message is SaveNewNoteRequested) {
     return ModelAndCommand(
@@ -196,12 +208,8 @@ ModelAndCommand reduce(Model model, Message message) {
           message.note.title,
           message.note.text,
           false,
-          NotePageViewSavedState(
-            model.searchString,
-            model.files,
-            model.currentFileIdx,
-            model.note,
-          ),
+          NoteListViewSavedState.empty(),
+          model.saveState(),
         ),
       );
     }
@@ -209,26 +217,14 @@ ModelAndCommand reduce(Model model, Message message) {
   if (message is NoteEditingCanceled) {
     if (model is NoteEditorModel) {
       return ModelAndCommand.justModel(
-        NotePageViewModel(
-          model.pageViewSavedState.searchString,
-          model.pageViewSavedState.files,
-          model.pageViewSavedState.currentFileIdx,
-          model.pageViewSavedState.note,
-        ),
+        NotePageViewModel.restore(model.pageViewSavedState),
       );
     }
   }
   if (message is SaveNoteRequested) {
     if (model is NoteEditorModel) {
       return ModelAndCommand(
-        SavingNoteModel(
-          NotePageViewSavedState(
-            model.pageViewSavedState.searchString,
-            model.pageViewSavedState.files,
-            model.pageViewSavedState.currentFileIdx,
-            model.pageViewSavedState.note,
-          ),
-        ),
+        SavingNoteModel(model.pageViewSavedState),
         SaveNote(
           model.fileName,
           message.title,
