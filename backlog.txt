@@ -7,6 +7,7 @@ List view:
 - --new note button--
 - try extracting first 5 lines and rendering as markdown
 - show error if cannot load
+- when list is empty, show "Empty"
 
 Page view:
 - --convert to markdown--

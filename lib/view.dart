@@ -71,18 +71,27 @@ Widget signOutInProgress() {
   );
 }
 
-AppBar defaultAppBar(BuildContext context) {
+AppBar defaultAppBar(String searchString, BuildContext context) {
   return AppBar(
-    title: Text(
-      'NotedOK',
-      style: GoogleFonts.openSans(
-        textStyle: TextStyle(
-          color: Colors.white,
-          fontSize: 22,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
-    ),
+    title:
+        searchString.isEmpty
+            ? Text(
+              'NotedOK',
+              style: GoogleFonts.openSans(
+                textStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            )
+            : Text(
+              searchString,
+              style: GoogleFonts.openSans(
+                textStyle: const TextStyle(color: Colors.white),
+                fontSize: textFontSize,
+              ),
+            ),
     backgroundColor: Theme.of(context).colorScheme.primary,
     foregroundColor: Colors.white,
   );
@@ -94,7 +103,7 @@ Widget retrievingFileList(
   void Function(Message) dispatch,
 ) {
   return Scaffold(
-    appBar: defaultAppBar(context),
+    appBar: defaultAppBar(model.searchString, context),
     drawer: drawer(context, dispatch),
     body: Center(child: spinner()),
     backgroundColor: Colors.white,
@@ -107,7 +116,7 @@ Widget fileListRetrieved(
   void Function(Message) dispatch,
 ) {
   return Scaffold(
-    appBar: defaultAppBar(context),
+    appBar: defaultAppBar(model.searchString, context),
     drawer: drawer(context, dispatch),
     body: Center(child: spinner()),
     backgroundColor: Colors.white,
@@ -160,7 +169,10 @@ Widget noteListView(
   void Function(Message) dispatch,
 ) {
   return Scaffold(
-    appBar: SearchableAppBar(dispatch: dispatch),
+    appBar: SearchableAppBar(
+      searchString: model.searchString,
+      dispatch: dispatch,
+    ),
     drawer: drawer(context, dispatch),
     body: RefreshIndicator(
       onRefresh: () {
@@ -331,7 +343,7 @@ class NoteView extends StatelessWidget {
 
 Widget savingNote(BuildContext context, void Function(Message) dispatch) {
   return Scaffold(
-    appBar: defaultAppBar(context),
+    appBar: defaultAppBar("", context),
     drawer: drawer(context, dispatch),
     body: Center(child: spinner()),
     backgroundColor: Colors.white,

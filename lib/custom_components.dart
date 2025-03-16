@@ -8,9 +8,14 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class SearchableAppBar extends StatefulWidget implements PreferredSizeWidget {
+  final String searchString;
   final void Function(Message) dispatch;
 
-  const SearchableAppBar({super.key, required this.dispatch});
+  const SearchableAppBar({
+    super.key,
+    required this.searchString,
+    required this.dispatch,
+  });
 
   @override
   State<SearchableAppBar> createState() => _SearchableAppBarState();
@@ -28,8 +33,8 @@ class _SearchableAppBarState extends State<SearchableAppBar> {
   void initState() {
     super.initState();
 
-    _controller.text = "";
-    _searchEmpty = true;
+    _controller.text = widget.searchString;
+    _searchEmpty = widget.searchString.isEmpty;
   }
 
   @override
@@ -93,16 +98,25 @@ class _SearchableAppBarState extends State<SearchableAppBar> {
     }
     // Default app bar - search is not activated
     return AppBar(
-      title: Text(
-        'NotedOK',
-        style: GoogleFonts.openSans(
-          textStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ),
+      title:
+          widget.searchString.isEmpty
+              ? Text(
+                'NotedOK',
+                style: GoogleFonts.openSans(
+                  textStyle: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              )
+              : Text(
+                widget.searchString,
+                style: GoogleFonts.openSans(
+                  textStyle: const TextStyle(color: Colors.white),
+                  fontSize: textFontSize,
+                ),
+              ),
       backgroundColor: Theme.of(context).colorScheme.primary,
       foregroundColor: Colors.white,
       actions: [
