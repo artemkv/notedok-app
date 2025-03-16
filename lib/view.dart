@@ -198,7 +198,7 @@ Widget noteListItem(Note note, int noteIdx, void Function(Message) dispatch) {
       dispatch(NoteListViewMoveToPageView(note, noteIdx));
     },
     child: SizedBox(
-      height: 180,
+      height: 176,
       child: Column(
         children: [
           Padding(
@@ -222,7 +222,7 @@ Widget noteListItem(Note note, int noteIdx, void Function(Message) dispatch) {
                 alignment: Alignment.topLeft,
                 child: Text(
                   note.text,
-                  style: GoogleFonts.openSans(fontSize: 12),
+                  style: GoogleFonts.openSans(fontSize: 14),
                 ),
               ),
             ),
