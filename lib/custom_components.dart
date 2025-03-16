@@ -156,9 +156,9 @@ class _NoteListState extends State<NoteList> {
       separatorBuilder: (BuildContext context, int index) {
         return const Divider(
           height: 12,
-          thickness: 1,
-          indent: 72,
-          endIndent: 72,
+          thickness: 0.5,
+          indent: 16,
+          endIndent: 16,
         );
       },
       itemBuilder: (BuildContext context, int index) {

@@ -198,7 +198,7 @@ Widget noteListItem(Note note, int noteIdx, void Function(Message) dispatch) {
       dispatch(NoteListViewMoveToPageView(note, noteIdx));
     },
     child: SizedBox(
-      height: 160,
+      height: 180,
       child: Column(
         children: [
           Padding(
@@ -218,7 +218,13 @@ Widget noteListItem(Note note, int noteIdx, void Function(Message) dispatch) {
             // TODO: can this show links? Should it?
             child: Padding(
               padding: EdgeInsets.only(top: 4, bottom: 16, left: 16, right: 16),
-              child: Text(note.text),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: Text(
+                  note.text,
+                  style: GoogleFonts.openSans(fontSize: 12),
+                ),
+              ),
             ),
           ),
         ],
