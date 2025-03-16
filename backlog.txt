@@ -1,5 +1,4 @@
 Everywhere:
-- filter on retrieved files
 - --covert filenames to titles--
 
 List view:
@@ -19,7 +18,7 @@ Page view:
 
 Editor:
 - --save new note--
-- save existing note, and rename if needed
+- --save existing note, and rename if needed--
 - show error if cannot save
 
 Search:

@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 @immutable
 class FileData {
   final String fileName;
-  final String lastModified;
+  final DateTime lastModified;
   final String etag;
 
   const FileData(this.fileName, this.lastModified, this.etag);
 
   FileData.fromJson(Map<String, dynamic> json)
     : fileName = json['fileName'],
-      lastModified = json['lastModified'],
+      lastModified = DateTime.parse(json['lastModified']),
       etag = json['etag'];
 }
 
