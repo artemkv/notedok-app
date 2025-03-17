@@ -120,27 +120,32 @@ class RetrieveFileList implements Command {
 
 @immutable
 class NoteListLoadFirstBatch implements Command {
-  final List<String> files;
+  final List<String> filesToLoad;
   final List<String> filesToPreload;
 
-  const NoteListLoadFirstBatch(this.files, this.filesToPreload);
+  const NoteListLoadFirstBatch(this.filesToLoad, this.filesToPreload);
 
   @override
   void execute(void Function(Message) dispatch) async {
-    final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
-    if (session.isSignedIn) {
-      var idToken = session.userPoolTokensResult.value.idToken;
+    try {
+      final session =
+          await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+      if (session.isSignedIn) {
+        var idToken = session.userPoolTokensResult.value.idToken;
 
-      try {
-        List<Note> notes = await loadNotes(files, idToken.raw);
+        List<Note> notes = await loadNotes(filesToLoad, idToken.raw);
         dispatch(NoteListViewFirstBatchLoaded(notes));
-      } catch (err) {
-        // TODO: dispatch error
-        safePrint(err);
-      }
 
-      // TODO: only if no error
-      preloadNotes(filesToPreload, idToken.raw);
+        preloadNotes(filesToPreload, idToken.raw);
+      }
+    } catch (err) {
+      dispatch(
+        NoteListViewFirstBatchLoadFailed(
+          filesToLoad,
+          filesToPreload,
+          err.toString(),
+        ),
+      );
     }
   }
 }

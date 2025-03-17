@@ -46,6 +46,30 @@ class NoteListViewFirstBatchLoaded implements Message {
 }
 
 @immutable
+class NoteListViewFirstBatchLoadFailed implements Message {
+  final List<String> filesToLoad;
+  final List<String> filesToPreload;
+  final String reason;
+
+  const NoteListViewFirstBatchLoadFailed(
+    this.filesToLoad,
+    this.filesToPreload,
+    this.reason,
+  );
+}
+
+@immutable
+class NoteListViewFirstBatchReloadRequested implements Message {
+  final List<String> filesToLoad;
+  final List<String> filesToPreload;
+
+  const NoteListViewFirstBatchReloadRequested(
+    this.filesToLoad,
+    this.filesToPreload,
+  );
+}
+
+@immutable
 class NoteListViewNextBatchRequested implements Message {}
 
 @immutable

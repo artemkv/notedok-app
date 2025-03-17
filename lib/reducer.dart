@@ -75,6 +75,32 @@ ModelAndCommand reduce(Model model, Message message) {
       );
     }
   }
+  if (message is NoteListViewFirstBatchLoadFailed) {
+    if (model is FileListRetrievedModel) {
+      return ModelAndCommand.justModel(
+        NoteListViewLoadingFirstBatchFailedModel(
+          model.searchString,
+          model.files,
+          model.unprocessedFiles,
+          message.filesToLoad,
+          message.filesToPreload,
+          message.reason,
+        ),
+      );
+    }
+  }
+  if (message is NoteListViewFirstBatchReloadRequested) {
+    if (model is NoteListViewLoadingFirstBatchFailedModel) {
+      return ModelAndCommand(
+        FileListRetrievedModel(
+          model.searchString,
+          model.files,
+          model.unprocessedFiles,
+        ),
+        NoteListLoadFirstBatch(message.filesToLoad, message.filesToPreload),
+      );
+    }
+  }
   if (message is NoteListViewNextBatchRequested) {
     if (model is NoteListViewModel) {
       var updatedItems = <NoteListItem>[];

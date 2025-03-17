@@ -70,6 +70,25 @@ class NoteListViewModel extends Model {
 }
 
 @immutable
+class NoteListViewLoadingFirstBatchFailedModel extends Model {
+  final String searchString;
+  final List<String> files;
+  final List<String> unprocessedFiles;
+  final List<String> filesToLoad;
+  final List<String> filesToPreload;
+  final String reason;
+
+  const NoteListViewLoadingFirstBatchFailedModel(
+    this.searchString,
+    this.files,
+    this.unprocessedFiles,
+    this.filesToLoad,
+    this.filesToPreload,
+    this.reason,
+  );
+}
+
+@immutable
 class NoteListViewSavedState {
   final String searchString;
   final List<String> files;

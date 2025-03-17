@@ -33,6 +33,9 @@ Widget home(
   if (model is NoteListViewModel) {
     return noteListView(context, model, dispatch);
   }
+  if (model is NoteListViewLoadingFirstBatchFailedModel) {
+    return noteListViewLoadingFirstBatchFailed(context, model, dispatch);
+  }
   if (model is NotePageViewModel) {
     return notePageView(context, model, dispatch);
   }
@@ -133,7 +136,13 @@ Widget fileListRetrievalFailed(
 ) {
   return Scaffold(
     appBar: AppBar(
-      title: const Text('Failed to load notes'),
+      title: Text(
+        'Failed to load notes',
+        style: GoogleFonts.openSans(
+          textStyle: const TextStyle(color: Colors.white),
+          fontSize: textFontSize,
+        ),
+      ),
       backgroundColor: Theme.of(context).colorScheme.primary,
       foregroundColor: Colors.white,
     ),
@@ -146,7 +155,12 @@ Widget fileListRetrievalFailed(
               alignment: Alignment.topLeft,
               child: Text(
                 "Failed to load notes: ${model.reason}",
-                style: TextStyle(fontSize: textFontSize, color: Colors.red),
+                style: GoogleFonts.openSans(
+                  textStyle: TextStyle(
+                    fontSize: textFontSize,
+                    color: Colors.red,
+                  ),
+                ),
               ),
             ),
           ),
@@ -155,6 +169,66 @@ Widget fileListRetrievalFailed(
               behavior: HitTestBehavior.translucent,
               onTap: () {
                 dispatch(FileListReloadRequested(model.searchString));
+              },
+              child: const Center(
+                child: Text(
+                  "Click to reload",
+                  style: TextStyle(fontSize: textFontSize, color: Colors.grey),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget noteListViewLoadingFirstBatchFailed(
+  BuildContext context,
+  NoteListViewLoadingFirstBatchFailedModel model,
+  void Function(Message) dispatch,
+) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text(
+        'Failed to load notes',
+        style: GoogleFonts.openSans(
+          textStyle: const TextStyle(color: Colors.white),
+          fontSize: textFontSize,
+        ),
+      ),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      foregroundColor: Colors.white,
+    ),
+    body: Center(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(textPadding),
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                "Failed to load notes: ${model.reason}",
+                style: GoogleFonts.openSans(
+                  textStyle: TextStyle(
+                    fontSize: textFontSize,
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () {
+                dispatch(
+                  NoteListViewFirstBatchReloadRequested(
+                    model.filesToLoad,
+                    model.filesToPreload,
+                  ),
+                );
               },
               child: const Center(
                 child: Text(
