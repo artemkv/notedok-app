@@ -42,6 +42,9 @@ Widget home(
   if (model is NotePageViewNoteLoadingModel) {
     return notePageViewNoteLoading(context, model, dispatch);
   }
+  if (model is NotePageViewLoadingNoteContentFailedModel) {
+    return notePageViewLoadingNoteContentFailed(context, model, dispatch);
+  }
   if (model is NoteEditorModel) {
     return NoteEditor(model: model, dispatch: dispatch);
   }
@@ -475,6 +478,61 @@ Widget notePageViewNoteLoading(
     ),
     body: Column(children: [Expanded(child: Center(child: spinner()))]),
     backgroundColor: Colors.white,
+  );
+}
+
+Widget notePageViewLoadingNoteContentFailed(
+  BuildContext context,
+  NotePageViewLoadingNoteContentFailedModel model,
+  void Function(Message) dispatch,
+) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text(
+        'Failed to load note',
+        style: GoogleFonts.openSans(
+          textStyle: const TextStyle(color: Colors.white),
+          fontSize: textFontSize,
+        ),
+      ),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      foregroundColor: Colors.white,
+    ),
+    body: Center(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(textPadding),
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                "Failed to load note: ${model.reason}",
+                style: GoogleFonts.openSans(
+                  textStyle: TextStyle(
+                    fontSize: textFontSize,
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () {
+                dispatch(NotePageViewReloadNoteContentRequested());
+              },
+              child: const Center(
+                child: Text(
+                  "Click to re-try",
+                  style: TextStyle(fontSize: textFontSize, color: Colors.grey),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
   );
 }
 

@@ -230,7 +230,6 @@ class LoadNoteContent implements Command {
   void execute(void Function(Message) dispatch) async {
     final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
     if (session.isSignedIn) {
-      // TODO: where can I store this?
       var idToken = session.userPoolTokensResult.value.idToken;
 
       try {
@@ -239,7 +238,7 @@ class LoadNoteContent implements Command {
         });
         dispatch(NotePageViewNoteContentLoaded(fileName, text));
       } catch (err) {
-        dispatch(NotePageViewNoteContentLoadingFailed()); // TODO: pass error
+        dispatch(NotePageViewNoteContentLoadingFailed(err.toString()));
       }
     }
   }
@@ -254,27 +253,31 @@ class PreloadNoteContent implements Command {
 
   @override
   void execute(void Function(Message) dispatch) async {
-    final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
-    if (session.isSignedIn) {
-      // TODO: where can I store this?
-      var idToken = session.userPoolTokensResult.value.idToken;
+    try {
+      final session =
+          await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+      if (session.isSignedIn) {
+        var idToken = session.userPoolTokensResult.value.idToken;
 
-      if (currentFileIdx > 0) {
-        preloader.preloadContent(files[currentFileIdx - 1], () {
-          return getFile(
-            files[currentFileIdx - 1],
-            () => Future.value(idToken.raw),
-          );
-        });
+        if (currentFileIdx > 0) {
+          preloader.preloadContent(files[currentFileIdx - 1], () {
+            return getFile(
+              files[currentFileIdx - 1],
+              () => Future.value(idToken.raw),
+            );
+          });
+        }
+        if (currentFileIdx < files.length - 1) {
+          preloader.preloadContent(files[currentFileIdx + 1], () {
+            return getFile(
+              files[currentFileIdx + 1],
+              () => Future.value(idToken.raw),
+            );
+          });
+        }
       }
-      if (currentFileIdx < files.length - 1) {
-        preloader.preloadContent(files[currentFileIdx + 1], () {
-          return getFile(
-            files[currentFileIdx + 1],
-            () => Future.value(idToken.raw),
-          );
-        });
-      }
+    } catch (err) {
+      // Ignore
     }
   }
 }

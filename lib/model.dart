@@ -232,6 +232,21 @@ class NotePageViewNoteLoadingModel extends Model {
 }
 
 @immutable
+class NotePageViewLoadingNoteContentFailedModel extends Model {
+  final String searchString;
+  final List<String> files;
+  final int currentFileIdx;
+  final String reason;
+
+  const NotePageViewLoadingNoteContentFailedModel(
+    this.searchString,
+    this.files,
+    this.currentFileIdx,
+    this.reason,
+  );
+}
+
+@immutable
 class NoteEditorModel extends Model {
   final String fileName;
   final String title;

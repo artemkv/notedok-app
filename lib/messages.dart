@@ -134,8 +134,13 @@ class NotePageViewNoteContentLoaded implements Message {
 
 @immutable
 class NotePageViewNoteContentLoadingFailed implements Message {
-  const NotePageViewNoteContentLoadingFailed();
+  final String reason;
+
+  const NotePageViewNoteContentLoadingFailed(this.reason);
 }
+
+@immutable
+class NotePageViewReloadNoteContentRequested implements Message {}
 
 @immutable
 class CreateNewNoteRequested implements Message {}

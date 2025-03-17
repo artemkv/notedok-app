@@ -257,6 +257,30 @@ ModelAndCommand reduce(Model model, Message message) {
       }
     }
   }
+  if (message is NotePageViewNoteContentLoadingFailed) {
+    if (model is NotePageViewNoteLoadingModel) {
+      return ModelAndCommand.justModel(
+        NotePageViewLoadingNoteContentFailedModel(
+          model.searchString,
+          model.files,
+          model.currentFileIdx,
+          message.reason,
+        ),
+      );
+    }
+  }
+  if (message is NotePageViewReloadNoteContentRequested) {
+    if (model is NotePageViewLoadingNoteContentFailedModel) {
+      return ModelAndCommand(
+        NotePageViewNoteLoadingModel(
+          model.searchString,
+          model.files,
+          model.currentFileIdx,
+        ),
+        LoadNoteContent(model.files[model.currentFileIdx]),
+      );
+    }
+  }
 
   if (message is CreateNewNoteRequested) {
     if (model is NoteListViewModel) {
