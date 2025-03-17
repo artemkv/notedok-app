@@ -45,6 +45,17 @@ ModelAndCommand reduce(Model model, Message message) {
       );
     }
   }
+  if (message is RetrieveFileListFailure) {
+    return ModelAndCommand.justModel(
+      FileListRetrievalFailedModel(message.searchString, message.reason),
+    );
+  }
+  if (message is FileListReloadRequested) {
+    return ModelAndCommand(
+      RetrievingFileListModel(message.searchString),
+      RetrieveFileList(message.searchString),
+    );
+  }
   if (message is NoteListViewFirstBatchLoaded) {
     if (model is FileListRetrievedModel) {
       var listItems =

@@ -37,6 +37,14 @@ class FileListRetrievedModel extends Model {
 }
 
 @immutable
+class FileListRetrievalFailedModel extends Model {
+  final String searchString;
+  final String reason;
+
+  const FileListRetrievalFailedModel(this.searchString, this.reason);
+}
+
+@immutable
 class NoteListViewModel extends Model {
   final String searchString;
   final List<String> files;

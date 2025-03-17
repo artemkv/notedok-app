@@ -27,6 +27,9 @@ Widget home(
   if (model is FileListRetrievedModel) {
     return fileListRetrieved(context, model, dispatch);
   }
+  if (model is FileListRetrievalFailedModel) {
+    return fileListRetrievalFailed(context, model, dispatch);
+  }
   if (model is NoteListViewModel) {
     return noteListView(context, model, dispatch);
   }
@@ -120,6 +123,50 @@ Widget fileListRetrieved(
     drawer: drawer(context, dispatch),
     body: Center(child: spinner()),
     backgroundColor: Colors.white,
+  );
+}
+
+Widget fileListRetrievalFailed(
+  BuildContext context,
+  FileListRetrievalFailedModel model,
+  void Function(Message) dispatch,
+) {
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Failed to load notes'),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      foregroundColor: Colors.white,
+    ),
+    body: Center(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(textPadding),
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                "Failed to load notes: ${model.reason}",
+                style: TextStyle(fontSize: textFontSize, color: Colors.red),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () {
+                dispatch(FileListReloadRequested(model.searchString));
+              },
+              child: const Center(
+                child: Text(
+                  "Click to reload",
+                  style: TextStyle(fontSize: textFontSize, color: Colors.grey),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
   );
 }
 

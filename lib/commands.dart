@@ -67,43 +67,53 @@ class RetrieveFileList implements Command {
   void execute(void Function(Message) dispatch) async {
     preloader.clean();
 
-    final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
-    if (session.isSignedIn) {
-      var idToken = session.userPoolTokensResult.value.idToken;
-      await signIn(idToken.raw);
+    try {
+      final session =
+          await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+      if (session.isSignedIn) {
+        var idToken = session.userPoolTokensResult.value.idToken;
+        await signIn(idToken.raw);
 
-      List<FileData> files = [];
+        List<FileData> files = [];
 
-      // Retrieve the first batch
-      var json = await getFiles(pageSize, "", () => Future.value(idToken.raw));
-      var getFilesResponse = GetFilesResponse.fromJson(json);
-      files.addAll(getFilesResponse.files);
-
-      // Keep retrieving until all
-      while (getFilesResponse.hasMore) {
-        json = await getFiles(
+        // Retrieve the first batch
+        var json = await getFiles(
           pageSize,
-          getFilesResponse.nextContinuationToken,
+          "",
           () => Future.value(idToken.raw),
         );
-        getFilesResponse = GetFilesResponse.fromJson(json);
+        var getFilesResponse = GetFilesResponse.fromJson(json);
         files.addAll(getFilesResponse.files);
+
+        // Keep retrieving until all
+        while (getFilesResponse.hasMore) {
+          json = await getFiles(
+            pageSize,
+            getFilesResponse.nextContinuationToken,
+            () => Future.value(idToken.raw),
+          );
+          getFilesResponse = GetFilesResponse.fromJson(json);
+          files.addAll(getFilesResponse.files);
+        }
+
+        var filesFiltered =
+            files
+                .where(
+                  (f) => f.fileName.toLowerCase().contains(
+                    searchString.toLowerCase(),
+                  ),
+                )
+                .toList();
+        filesFiltered.sort((a, b) => b.lastModified.compareTo(a.lastModified));
+
+        dispatch(
+          RetrieveFileListSuccess(
+            filesFiltered.map((f) => f.fileName).toList(),
+          ),
+        );
       }
-
-      var filesFiltered =
-          files
-              .where(
-                (f) => f.fileName.toLowerCase().contains(
-                  searchString.toLowerCase(),
-                ),
-              )
-              .toList();
-      filesFiltered.sort((a, b) => b.lastModified.compareTo(a.lastModified));
-
-      // TODO: handle errors
-      dispatch(
-        RetrieveFileListSuccess(filesFiltered.map((f) => f.fileName).toList()),
-      );
+    } catch (err) {
+      dispatch(RetrieveFileListFailure(searchString, err.toString()));
     }
   }
 }

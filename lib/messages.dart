@@ -24,6 +24,21 @@ class RetrieveFileListSuccess implements Message {
 }
 
 @immutable
+class RetrieveFileListFailure implements Message {
+  final String searchString;
+  final String reason;
+
+  const RetrieveFileListFailure(this.searchString, this.reason);
+}
+
+@immutable
+class FileListReloadRequested implements Message {
+  final String searchString;
+
+  const FileListReloadRequested(this.searchString);
+}
+
+@immutable
 class NoteListViewFirstBatchLoaded implements Message {
   final List<Note> notes;
 
