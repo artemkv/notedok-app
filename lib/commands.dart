@@ -136,7 +136,11 @@ class NoteListLoadFirstBatch implements Command {
         List<Note> notes = await loadNotes(filesToLoad, idToken.raw);
         dispatch(NoteListViewFirstBatchLoaded(notes));
 
-        preloadNotes(filesToPreload, idToken.raw);
+        try {
+          preloadNotes(filesToPreload, idToken.raw);
+        } catch (err) {
+          // Ignore errors
+        }
       }
     } catch (err) {
       dispatch(
@@ -168,7 +172,11 @@ class NoteListLoadNextBatch implements Command {
         List<Note> notes = await loadNotes(filesToLoad, idToken.raw);
         dispatch(NoteListViewNextBatchLoaded(notes));
 
-        preloadNotes(filesToPreload, idToken.raw);
+        try {
+          preloadNotes(filesToPreload, idToken.raw);
+        } catch (err) {
+          // Ignore errors
+        }
       }
     } catch (err) {
       dispatch(

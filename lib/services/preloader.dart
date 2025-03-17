@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 // And once the result is unpacked, we either store the value or,
 // if we receive an error, we forget it
 
-// TODO: next step is to test with actual errors
-
 @immutable
 class PreloadResult<T> {
   final bool hasResult;
