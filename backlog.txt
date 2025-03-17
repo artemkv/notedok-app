@@ -7,8 +7,8 @@ List view:
 - --load more on scroll down--
 - --new note button--
 - --some notes have their text centered--
+- --when list is empty, show "Nothing found"--
 - show error if cannot load
-- when list is empty, show "Empty"
 - let items expand??
 - try extracting first 5 lines and rendering as markdown??
 

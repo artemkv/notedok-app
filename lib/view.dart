@@ -179,7 +179,20 @@ Widget noteListView(
         dispatch(NoteListViewReloadRequested());
         return Future<void>.value(null);
       },
-      child: NoteList(model: model, dispatch: dispatch),
+      child:
+          model.files.isNotEmpty
+              ? NoteList(model: model, dispatch: dispatch)
+              : Center(
+                child: Text(
+                  "Nothing found",
+                  style: GoogleFonts.openSans(
+                    textStyle: const TextStyle(
+                      fontSize: textFontSize,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              ),
     ),
     backgroundColor: Colors.white,
     floatingActionButton: (FloatingActionButton(
