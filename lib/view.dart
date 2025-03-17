@@ -380,6 +380,54 @@ Widget noteListItemLoadingMore() {
   );
 }
 
+Widget noteListItemRetryLoadMore(
+  final List<String> filesToLoad,
+  final List<String> filesToPreload,
+  String reason,
+  void Function(Message) dispatch,
+) {
+  return GestureDetector(
+    behavior: HitTestBehavior.translucent,
+    onTap: () {
+      dispatch(
+        NoteListViewNextBatchReloadRequested(filesToLoad, filesToPreload),
+      );
+    },
+    child: Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(textPadding),
+          child: Text(
+            "Failed to load more notes: $reason",
+            style: const TextStyle(fontSize: textFontSize, color: Colors.red),
+          ),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Text(
+                    "Click to re-try",
+                    style: GoogleFonts.openSans(
+                      textStyle: const TextStyle(
+                        fontSize: textFontSize,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
 AppBar notePageViewAppBar(
   BuildContext context,
   int noteIdx,

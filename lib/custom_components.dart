@@ -174,6 +174,16 @@ class _NoteListState extends State<NoteList> {
         if (item is NoteListItemLoadingMore) {
           return ListTile(title: noteListItemLoadingMore());
         }
+        if (item is NoteListItemRetryLoadMore) {
+          return ListTile(
+            title: noteListItemRetryLoadMore(
+              item.filesToLoad,
+              item.filesToPreload,
+              item.reason,
+              widget.dispatch,
+            ),
+          );
+        }
 
         throw "Unknown type of NoteListItem";
       },

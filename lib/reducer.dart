@@ -152,6 +152,49 @@ ModelAndCommand reduce(Model model, Message message) {
       );
     }
   }
+  if (message is NoteListViewNextBatchLoadFailed) {
+    if (model is NoteListViewModel) {
+      var updatedItems = <NoteListItem>[];
+      updatedItems.addAll(
+        model.items.getRange(0, model.items.length - 1),
+      ); // old items except the spinner
+      updatedItems.add(
+        NoteListItemRetryLoadMore(
+          message.filesToLoad,
+          message.filesToPreload,
+          message.reason,
+        ),
+      );
+
+      return ModelAndCommand.justModel(
+        NoteListViewModel(
+          model.searchString,
+          model.files,
+          model.unprocessedFiles,
+          updatedItems,
+        ),
+      );
+    }
+  }
+  if (message is NoteListViewNextBatchReloadRequested) {
+    if (model is NoteListViewModel) {
+      var updatedItems = <NoteListItem>[];
+      updatedItems.addAll(
+        model.items.getRange(0, model.items.length - 1),
+      ); // old items except the spinner
+      updatedItems.add(NoteListItemLoadingMore());
+
+      return ModelAndCommand(
+        NoteListViewModel(
+          model.searchString,
+          model.files,
+          model.unprocessedFiles,
+          updatedItems,
+        ),
+        NoteListLoadNextBatch(message.filesToLoad, message.filesToPreload),
+      );
+    }
+  }
   if (message is NoteListViewReloadRequested) {
     if (model is NoteListViewModel) {
       return ModelAndCommand(

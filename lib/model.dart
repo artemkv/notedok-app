@@ -153,9 +153,15 @@ class NoteListItemLoadingMore extends NoteListItem {
 
 @immutable
 class NoteListItemRetryLoadMore extends NoteListItem {
+  final List<String> filesToLoad;
+  final List<String> filesToPreload;
   final String reason;
 
-  const NoteListItemRetryLoadMore(this.reason);
+  const NoteListItemRetryLoadMore(
+    this.filesToLoad,
+    this.filesToPreload,
+    this.reason,
+  );
 
   @override
   bool operator ==(Object other) {
