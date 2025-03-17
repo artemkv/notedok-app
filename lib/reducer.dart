@@ -234,17 +234,14 @@ ModelAndCommand reduce(Model model, Message message) {
           model.files,
           message.noteIdx,
         ),
-        CommandList([
-          LoadNoteContent(model.files[message.noteIdx]),
-          PreloadNoteContent(model.files, message.noteIdx),
-        ]),
+        LoadNoteContent(model.files[message.noteIdx]),
       );
     }
   }
   if (message is NotePageViewNoteContentLoaded) {
     if (model is NotePageViewNoteLoadingModel) {
       if (model.files[model.currentFileIdx] == message.fileName) {
-        return ModelAndCommand.justModel(
+        return ModelAndCommand(
           NotePageViewModel(
             model.searchString,
             model.files,
@@ -255,6 +252,7 @@ ModelAndCommand reduce(Model model, Message message) {
               message.text,
             ),
           ),
+          PreloadNoteContent(model.files, model.currentFileIdx),
         );
       }
     }
