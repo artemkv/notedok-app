@@ -1,13 +1,18 @@
+import 'dart:async';
+
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:notedok/conversions.dart';
 import 'package:notedok/domain.dart';
 import 'package:notedok/messages.dart';
+import 'package:notedok/services/preloader.dart';
 import 'package:notedok/services/rest_api.dart' show RestApiException;
 import 'package:notedok/services/session_api.dart';
 
 // This is the only place where side-effects are allowed!
+
+Preloader preloader = Preloader();
 
 @immutable
 abstract class Command {
@@ -29,6 +34,20 @@ class None implements Command {
 }
 
 @immutable
+class CommandList implements Command {
+  final List<Command> items;
+
+  const CommandList(this.items);
+
+  @override
+  void execute(void Function(Message) dispatch) {
+    for (var cmd in items) {
+      cmd.execute(dispatch);
+    }
+  }
+}
+
+@immutable
 class SignOut implements Command {
   @override
   void execute(void Function(Message) dispatch) async {
@@ -46,6 +65,8 @@ class RetrieveFileList implements Command {
 
   @override
   void execute(void Function(Message) dispatch) async {
+    preloader.clean();
+
     final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
     if (session.isSignedIn) {
       var idToken = session.userPoolTokensResult.value.idToken;
@@ -90,8 +111,9 @@ class RetrieveFileList implements Command {
 @immutable
 class NoteListLoadFirstBatch implements Command {
   final List<String> files;
+  final List<String> filesToPreload;
 
-  const NoteListLoadFirstBatch(this.files);
+  const NoteListLoadFirstBatch(this.files, this.filesToPreload);
 
   @override
   void execute(void Function(Message) dispatch) async {
@@ -106,6 +128,9 @@ class NoteListLoadFirstBatch implements Command {
         // TODO: dispatch error
         safePrint(err);
       }
+
+      // TODO: only if no error
+      preloadNotes(filesToPreload, idToken.raw);
     }
   }
 }
@@ -113,8 +138,9 @@ class NoteListLoadFirstBatch implements Command {
 @immutable
 class NoteListLoadNextBatch implements Command {
   final List<String> files;
+  final List<String> filesToPreload;
 
-  const NoteListLoadNextBatch(this.files);
+  const NoteListLoadNextBatch(this.files, this.filesToPreload);
 
   @override
   void execute(void Function(Message) dispatch) async {
@@ -129,6 +155,9 @@ class NoteListLoadNextBatch implements Command {
         // TODO: dispatch error
         safePrint(err);
       }
+
+      // TODO: only if no error
+      preloadNotes(filesToPreload, idToken.raw);
     }
   }
 }
@@ -138,7 +167,11 @@ Future<List<Note>> loadNotes(List<String> files, String idToken) async {
   final List<Future<String>> pendingRequests = [];
   for (var i = 0; i < files.length; i++) {
     String fileName = files[i];
-    pendingRequests.add(getFile(fileName, () => Future.value(idToken)));
+    pendingRequests.add(
+      preloader.getContent(fileName, () {
+        return getFile(fileName, () => Future.value(idToken));
+      }),
+    );
   }
   var results = await Future.wait(pendingRequests);
   for (var i = 0; i < files.length; i++) {
@@ -148,6 +181,15 @@ Future<List<Note>> loadNotes(List<String> files, String idToken) async {
     notes.add(note);
   }
   return notes;
+}
+
+void preloadNotes(List<String> files, String idToken) async {
+  for (var i = 0; i < files.length; i++) {
+    String fileName = files[i];
+    preloader.preloadContent(fileName, () {
+      return getFile(fileName, () => Future.value(idToken));
+    });
+  }
 }
 
 @immutable
@@ -164,12 +206,60 @@ class LoadNoteContent implements Command {
       var idToken = session.userPoolTokensResult.value.idToken;
 
       try {
-        var text = await getFile(fileName, () => Future.value(idToken.raw));
+        var text = await preloader.getContent(fileName, () {
+          return getFile(fileName, () => Future.value(idToken.raw));
+        });
         dispatch(NotePageViewNoteContentLoaded(fileName, text));
       } catch (err) {
         dispatch(NotePageViewNoteContentLoadingFailed()); // TODO: pass error
       }
     }
+  }
+}
+
+@immutable
+class PreloadNoteContent implements Command {
+  final List<String> files;
+  final int currentFileIdx;
+
+  const PreloadNoteContent(this.files, this.currentFileIdx);
+
+  @override
+  void execute(void Function(Message) dispatch) async {
+    final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+    if (session.isSignedIn) {
+      // TODO: where can I store this?
+      var idToken = session.userPoolTokensResult.value.idToken;
+
+      if (currentFileIdx > 0) {
+        preloader.preloadContent(files[currentFileIdx - 1], () {
+          return getFile(
+            files[currentFileIdx - 1],
+            () => Future.value(idToken.raw),
+          );
+        });
+      }
+      if (currentFileIdx < files.length - 1) {
+        preloader.preloadContent(files[currentFileIdx + 1], () {
+          return getFile(
+            files[currentFileIdx + 1],
+            () => Future.value(idToken.raw),
+          );
+        });
+      }
+    }
+  }
+}
+
+@immutable
+class InvalidatePreloadedContent implements Command {
+  final String fileName;
+
+  const InvalidatePreloadedContent(this.fileName);
+
+  @override
+  void execute(void Function(Message) dispatch) async {
+    preloader.dropPreload(fileName);
   }
 }
 

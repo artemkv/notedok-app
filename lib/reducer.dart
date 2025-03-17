@@ -38,7 +38,10 @@ ModelAndCommand reduce(Model model, Message message) {
           message.files,
           message.files.skip(noteBatchSize).toList(),
         ),
-        NoteListLoadFirstBatch(message.files.take(noteBatchSize).toList()),
+        NoteListLoadFirstBatch(
+          message.files.take(noteBatchSize).toList(),
+          message.files.skip(noteBatchSize).take(noteBatchSize).toList(),
+        ),
       );
     }
   }
@@ -78,6 +81,10 @@ ModelAndCommand reduce(Model model, Message message) {
         ),
         NoteListLoadNextBatch(
           model.unprocessedFiles.take(noteBatchSize).toList(),
+          model.unprocessedFiles
+              .skip(noteBatchSize)
+              .take(noteBatchSize)
+              .toList(),
         ),
       );
     }
@@ -119,13 +126,14 @@ ModelAndCommand reduce(Model model, Message message) {
 
   if (message is NoteListViewMoveToPageView) {
     if (model is NoteListViewModel) {
-      return ModelAndCommand.justModel(
+      return ModelAndCommand(
         NotePageViewModel(
           model.searchString,
           model.files,
           message.noteIdx,
           message.note,
         ),
+        PreloadNoteContent(model.files, message.noteIdx),
       );
     }
   }
@@ -146,7 +154,10 @@ ModelAndCommand reduce(Model model, Message message) {
           model.files,
           message.noteIdx,
         ),
-        LoadNoteContent(model.files[message.noteIdx]),
+        CommandList([
+          LoadNoteContent(model.files[message.noteIdx]),
+          PreloadNoteContent(model.files, message.noteIdx),
+        ]),
       );
     }
   }
@@ -225,18 +236,22 @@ ModelAndCommand reduce(Model model, Message message) {
     if (model is NoteEditorModel) {
       return ModelAndCommand(
         SavingNoteModel(model.pageViewSavedState),
-        SaveNote(
-          model.fileName,
-          message.title,
-          message.text,
-          message.oldTitle,
-          message.oldText,
-        ),
+        CommandList([
+          InvalidatePreloadedContent(model.fileName),
+          SaveNote(
+            model.fileName,
+            message.title,
+            message.text,
+            message.oldTitle,
+            message.oldText,
+          ),
+        ]),
       );
     }
   }
   if (message is NoteSaved) {
     if (model is SavingNoteModel) {
+      // TODO: if title was updated, the file list contains incorrect entry
       return ModelAndCommand.justModel(
         NotePageViewModel(
           model.pageViewSavedState.searchString,
