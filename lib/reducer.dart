@@ -390,6 +390,84 @@ ModelAndCommand reduce(Model model, Message message) {
       );
     }
   }
+  if (message is SavingNoteFailed) {
+    if (model is SavingNoteModel) {
+      return ModelAndCommand.justModel(
+        SavingNoteFailedModel(
+          model.pageViewSavedState,
+          message.path,
+          message.title,
+          message.text,
+          message.oldTitle,
+          message.oldText,
+          message.reason,
+        ),
+      );
+    }
+  }
+  if (message is RenamingNoteFailed) {
+    if (model is SavingNoteModel) {
+      return ModelAndCommand.justModel(
+        RenamingNoteFailedModel(
+          model.pageViewSavedState,
+          message.path,
+          message.newPath,
+          message.title,
+          message.text,
+          message.reason,
+        ),
+      );
+    }
+  }
+  if (message is RenamingNoteWithUniquePathFailed) {
+    if (model is SavingNoteModel) {
+      return ModelAndCommand.justModel(
+        RenamingNoteWithUniquePathFailedModel(
+          model.pageViewSavedState,
+          message.path,
+          message.newPath,
+          message.title,
+          message.text,
+          message.reason,
+        ),
+      );
+    }
+  }
+  if (message is SavingNoteRetryRequested) {
+    if (model is SavingNoteFailedModel) {
+      return ModelAndCommand(
+        SavingNoteModel(model.pageViewSavedState),
+        SaveNote(
+          message.path,
+          message.title,
+          message.text,
+          message.oldTitle,
+          message.oldText,
+        ),
+      );
+    }
+  }
+  if (message is RenamingNoteRetryRequested) {
+    if (model is RenamingNoteFailedModel) {
+      return ModelAndCommand(
+        SavingNoteModel(model.pageViewSavedState),
+        RenameNote(message.path, message.newPath, message.title, message.text),
+      );
+    }
+  }
+  if (message is RenamingNoteWithUniquePathRetryRequested) {
+    if (model is RenamingNoteWithUniquePathFailedModel) {
+      return ModelAndCommand(
+        SavingNoteModel(model.pageViewSavedState),
+        RenameNoteWithUniquePath(
+          message.path,
+          message.newPath,
+          message.title,
+          message.text,
+        ),
+      );
+    }
+  }
 
   return ModelAndCommand.justModel(model);
 }

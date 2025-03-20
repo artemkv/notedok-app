@@ -60,6 +60,15 @@ Widget home(
   if (model is SavingNoteModel) {
     return savingNote(context, dispatch);
   }
+  if (model is SavingNoteFailedModel) {
+    return savingNoteFailed(context, model, dispatch);
+  }
+  if (model is RenamingNoteFailedModel) {
+    return renamingNoteFailed(context, model, dispatch);
+  }
+  if (model is RenamingNoteWithUniquePathFailedModel) {
+    return renamingNoteWithUniquePathFailed(context, model, dispatch);
+  }
 
   return unknownModel(model);
 }
@@ -699,6 +708,193 @@ Widget savingNewNoteWithUniquePathFailed(
                 dispatch(
                   SavingNewNoteWithUniquePathRetryRequested(
                     model.path,
+                    model.text,
+                  ),
+                );
+              },
+              child: const Center(
+                child: Text(
+                  "Click to re-try",
+                  style: TextStyle(fontSize: textFontSize, color: Colors.grey),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget savingNoteFailed(
+  BuildContext context,
+  SavingNoteFailedModel model,
+  void Function(Message) dispatch,
+) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text(
+        'Failed to save note',
+        style: GoogleFonts.openSans(
+          textStyle: const TextStyle(color: Colors.white),
+          fontSize: textFontSize,
+        ),
+      ),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      foregroundColor: Colors.white,
+    ),
+    body: Center(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(textPadding),
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                "Failed to save note: ${model.reason}",
+                style: GoogleFonts.openSans(
+                  textStyle: TextStyle(
+                    fontSize: textFontSize,
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () {
+                dispatch(
+                  SavingNoteRetryRequested(
+                    model.path,
+                    model.title,
+                    model.text,
+                    model.oldTitle,
+                    model.oldText,
+                  ),
+                );
+              },
+              child: const Center(
+                child: Text(
+                  "Click to re-try",
+                  style: TextStyle(fontSize: textFontSize, color: Colors.grey),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget renamingNoteFailed(
+  BuildContext context,
+  RenamingNoteFailedModel model,
+  void Function(Message) dispatch,
+) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text(
+        'Failed to save note',
+        style: GoogleFonts.openSans(
+          textStyle: const TextStyle(color: Colors.white),
+          fontSize: textFontSize,
+        ),
+      ),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      foregroundColor: Colors.white,
+    ),
+    body: Center(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(textPadding),
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                "Failed to save note: ${model.reason}",
+                style: GoogleFonts.openSans(
+                  textStyle: TextStyle(
+                    fontSize: textFontSize,
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () {
+                dispatch(
+                  RenamingNoteRetryRequested(
+                    model.path,
+                    model.newPath,
+                    model.title,
+                    model.text,
+                  ),
+                );
+              },
+              child: const Center(
+                child: Text(
+                  "Click to re-try",
+                  style: TextStyle(fontSize: textFontSize, color: Colors.grey),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget renamingNoteWithUniquePathFailed(
+  BuildContext context,
+  RenamingNoteWithUniquePathFailedModel model,
+  void Function(Message) dispatch,
+) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text(
+        'Failed to save note',
+        style: GoogleFonts.openSans(
+          textStyle: const TextStyle(color: Colors.white),
+          fontSize: textFontSize,
+        ),
+      ),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      foregroundColor: Colors.white,
+    ),
+    body: Center(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(textPadding),
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                "Failed to save note: ${model.reason}",
+                style: GoogleFonts.openSans(
+                  textStyle: TextStyle(
+                    fontSize: textFontSize,
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () {
+                dispatch(
+                  RenamingNoteWithUniquePathRetryRequested(
+                    model.path,
+                    model.newPath,
+                    model.title,
                     model.text,
                   ),
                 );

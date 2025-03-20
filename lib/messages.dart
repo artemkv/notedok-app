@@ -222,7 +222,100 @@ class NoteSaved implements Message {
 
 @immutable
 class SavingNoteFailed implements Message {
+  final String path;
+  final String title;
+  final String text;
+  final String oldTitle;
+  final String oldText;
   final String reason;
 
-  const SavingNoteFailed(this.reason);
+  const SavingNoteFailed(
+    this.path,
+    this.title,
+    this.text,
+    this.oldTitle,
+    this.oldText,
+    this.reason,
+  );
+}
+
+@immutable
+class RenamingNoteFailed implements Message {
+  final String path;
+  final String newPath;
+  final String title;
+  final String text;
+  final String reason;
+
+  const RenamingNoteFailed(
+    this.path,
+    this.newPath,
+    this.title,
+    this.text,
+    this.reason,
+  );
+}
+
+@immutable
+class RenamingNoteWithUniquePathFailed implements Message {
+  final String path;
+  final String newPath;
+  final String title;
+  final String text;
+  final String reason;
+
+  const RenamingNoteWithUniquePathFailed(
+    this.path,
+    this.newPath,
+    this.title,
+    this.text,
+    this.reason,
+  );
+}
+
+@immutable
+class SavingNoteRetryRequested implements Message {
+  final String path;
+  final String title;
+  final String text;
+  final String oldTitle;
+  final String oldText;
+
+  const SavingNoteRetryRequested(
+    this.path,
+    this.title,
+    this.text,
+    this.oldTitle,
+    this.oldText,
+  );
+}
+
+@immutable
+class RenamingNoteRetryRequested implements Message {
+  final String path;
+  final String newPath;
+  final String title;
+  final String text;
+
+  const RenamingNoteRetryRequested(
+    this.path,
+    this.newPath,
+    this.title,
+    this.text,
+  );
+}
+
+@immutable
+class RenamingNoteWithUniquePathRetryRequested implements Message {
+  final String path;
+  final String newPath;
+  final String title;
+  final String text;
+
+  const RenamingNoteWithUniquePathRetryRequested(
+    this.path,
+    this.newPath,
+    this.title,
+    this.text,
+  );
 }

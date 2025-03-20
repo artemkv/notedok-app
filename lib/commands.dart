@@ -383,23 +383,81 @@ class SaveNote implements Command {
 
   @override
   void execute(void Function(Message) dispatch) async {
-    final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
-    if (session.isSignedIn) {
-      var idToken = session.userPoolTokensResult.value.idToken;
+    try {
+      final session =
+          await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+      if (session.isSignedIn) {
+        var idToken = session.userPoolTokensResult.value.idToken;
 
-      // First save text
-      try {
+        // First save text
         await putFile(path, text, () => Future.value(idToken.raw));
-      } catch (err) {
-        // TODO: dispatch failed
-        // TODO: think about retry carefully
-      }
 
-      // Now rename, if needed
-      if (title != oldTitle) {
-        // First time try with path derived from title
-        // Unless title is empty, in which case we immediately ask for a unique one
-        String newPath = generatePathFromTitle(title, title.isEmpty);
+        // Now rename, if needed
+        if (title != oldTitle) {
+          // First time try with path derived from title
+          // Unless title is empty, in which case we immediately ask for a unique one
+          String newPath = generatePathFromTitle(title, title.isEmpty);
+
+          try {
+            await renameFile(path, newPath, () => Future.value(idToken.raw));
+            dispatch(NoteSaved(Note(newPath, title, text)));
+          } catch (err) {
+            if (err is RestApiException && err.statusCode == 409) {
+              // Regenerate path from title, this time focing uniqueness
+              newPath = generatePathFromTitle(title, true);
+              try {
+                await renameFile(
+                  path,
+                  newPath,
+                  () => Future.value(idToken.raw),
+                );
+                dispatch(NoteSaved(Note(newPath, title, text)));
+              } catch (err) {
+                dispatch(
+                  RenamingNoteWithUniquePathFailed(
+                    path,
+                    newPath,
+                    title,
+                    text,
+                    err.toString(),
+                  ),
+                );
+              }
+            } else {
+              dispatch(
+                RenamingNoteFailed(path, newPath, title, text, err.toString()),
+              );
+              return;
+            }
+          }
+        } else {
+          dispatch(NoteSaved(Note(path, title, text)));
+        }
+      }
+    } catch (err) {
+      dispatch(
+        SavingNoteFailed(path, title, text, oldTitle, oldText, err.toString()),
+      );
+    }
+  }
+}
+
+@immutable
+class RenameNote implements Command {
+  final String path;
+  final String newPath;
+  final String title;
+  final String text;
+
+  const RenameNote(this.path, this.newPath, this.title, this.text);
+
+  @override
+  void execute(void Function(Message) dispatch) async {
+    try {
+      final session =
+          await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+      if (session.isSignedIn) {
+        var idToken = session.userPoolTokensResult.value.idToken;
 
         try {
           await renameFile(path, newPath, () => Future.value(idToken.raw));
@@ -407,22 +465,74 @@ class SaveNote implements Command {
         } catch (err) {
           if (err is RestApiException && err.statusCode == 409) {
             // Regenerate path from title, this time focing uniqueness
-            newPath = generatePathFromTitle(title, true);
+            String newUniquePath = generatePathFromTitle(title, true);
             try {
-              await renameFile(path, newPath, () => Future.value(idToken.raw));
-              dispatch(NoteSaved(Note(newPath, title, text)));
+              await renameFile(
+                path,
+                newUniquePath,
+                () => Future.value(idToken.raw),
+              );
+              dispatch(NoteSaved(Note(newUniquePath, title, text)));
             } catch (err) {
-              // TODO: dispatch failed
-              // TODO: think about retry carefully
+              dispatch(
+                RenamingNoteWithUniquePathFailed(
+                  path,
+                  newUniquePath,
+                  title,
+                  text,
+                  err.toString(),
+                ),
+              );
             }
           } else {
-            // TODO: dispatch failed
-            // TODO: think about retry carefully
+            dispatch(
+              RenamingNoteFailed(path, newPath, title, text, err.toString()),
+            );
+            return;
           }
         }
-      } else {
-        dispatch(NoteSaved(Note(path, title, text)));
       }
+    } catch (err) {
+      dispatch(RenamingNoteFailed(path, newPath, title, text, err.toString()));
+    }
+  }
+}
+
+@immutable
+class RenameNoteWithUniquePath implements Command {
+  final String path;
+  final String newPath;
+  final String title;
+  final String text;
+
+  const RenameNoteWithUniquePath(
+    this.path,
+    this.newPath,
+    this.title,
+    this.text,
+  );
+
+  @override
+  void execute(void Function(Message) dispatch) async {
+    try {
+      final session =
+          await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+      if (session.isSignedIn) {
+        var idToken = session.userPoolTokensResult.value.idToken;
+
+        await renameFile(path, newPath, () => Future.value(idToken.raw));
+        dispatch(NoteSaved(Note(newPath, title, text)));
+      }
+    } catch (err) {
+      dispatch(
+        RenamingNoteWithUniquePathFailed(
+          path,
+          newPath,
+          title,
+          text,
+          err.toString(),
+        ),
+      );
     }
   }
 }

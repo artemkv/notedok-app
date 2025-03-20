@@ -296,3 +296,62 @@ class SavingNoteModel extends Model {
 
   const SavingNoteModel(this.pageViewSavedState);
 }
+
+@immutable
+class SavingNoteFailedModel implements Model {
+  final NotePageViewSavedState pageViewSavedState;
+  final String path;
+  final String title;
+  final String text;
+  final String oldTitle;
+  final String oldText;
+  final String reason;
+
+  const SavingNoteFailedModel(
+    this.pageViewSavedState,
+    this.path,
+    this.title,
+    this.text,
+    this.oldTitle,
+    this.oldText,
+    this.reason,
+  );
+}
+
+@immutable
+class RenamingNoteFailedModel implements Model {
+  final NotePageViewSavedState pageViewSavedState;
+  final String path;
+  final String newPath;
+  final String title;
+  final String text;
+  final String reason;
+
+  const RenamingNoteFailedModel(
+    this.pageViewSavedState,
+    this.path,
+    this.newPath,
+    this.title,
+    this.text,
+    this.reason,
+  );
+}
+
+@immutable
+class RenamingNoteWithUniquePathFailedModel implements Model {
+  final NotePageViewSavedState pageViewSavedState;
+  final String path;
+  final String newPath;
+  final String title;
+  final String text;
+  final String reason;
+
+  const RenamingNoteWithUniquePathFailedModel(
+    this.pageViewSavedState,
+    this.path,
+    this.newPath,
+    this.title,
+    this.text,
+    this.reason,
+  );
+}
