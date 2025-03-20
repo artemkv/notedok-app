@@ -8,7 +8,7 @@ List view:
 - --new note button--
 - --some notes have their text centered--
 - --when list is empty, show "Nothing found"--
-- show error if cannot load
+- --show error if cannot load--
 - let items expand??
 - try extracting first 5 lines and rendering as markdown??
 
@@ -17,14 +17,14 @@ Page view:
 - --render markdown--
 - --edit note button--
 - --show counter--
-- show error if cannot load
+- --show error if cannot load--
 - follow links
 
 Editor:
 - --save new note--
 - --save existing note, and rename if needed--
-- show error if cannot save
-- saving note should update the filename in the list
+- --show error if cannot save--
+- --saving note should update the filename in the list--
 
 Search:
 - --when submitted, re-load with filter--

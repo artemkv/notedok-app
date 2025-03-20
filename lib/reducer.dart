@@ -379,11 +379,28 @@ ModelAndCommand reduce(Model model, Message message) {
   }
   if (message is NoteSaved) {
     if (model is SavingNoteModel) {
-      // TODO: if title was updated, the file list contains incorrect entry
+      var filesUpdated = <String>[];
+      filesUpdated.addAll(
+        model.pageViewSavedState.files.getRange(
+          0,
+          model.pageViewSavedState.currentFileIdx,
+        ),
+      );
+      filesUpdated.add(message.note.fileName);
+      if (model.pageViewSavedState.currentFileIdx <
+          model.pageViewSavedState.files.length - 1) {
+        filesUpdated.addAll(
+          model.pageViewSavedState.files.getRange(
+            model.pageViewSavedState.currentFileIdx + 1,
+            model.pageViewSavedState.files.length,
+          ),
+        );
+      }
+
       return ModelAndCommand.justModel(
         NotePageViewModel(
           model.pageViewSavedState.searchString,
-          model.pageViewSavedState.files,
+          filesUpdated,
           model.pageViewSavedState.currentFileIdx,
           message.note,
         ),
