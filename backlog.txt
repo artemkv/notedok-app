@@ -18,7 +18,7 @@ Page view:
 - --edit note button--
 - --show counter--
 - --show error if cannot load--
-- follow links
+- --follow links--
 
 Editor:
 - --save new note--

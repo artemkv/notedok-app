@@ -7,6 +7,7 @@ import 'package:notedok/formatting.dart';
 import 'package:notedok/messages.dart';
 import 'package:notedok/model.dart';
 import 'package:notedok/theme.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // These should be all stateless! No side effects allowed!
 
@@ -597,6 +598,16 @@ class NoteView extends StatelessWidget {
         ? Markdown(
           data:
               "# ${model.note.title}\n\n${LegacyWikiToMdFormatter().format(model.note.text)}",
+          onTapLink: (text, href, title) {
+            if (href != null) {
+              try {
+                var parsedUrl = Uri.parse(href);
+                launchUrl(parsedUrl);
+              } catch (err) {
+                // Ignore
+              }
+            }
+          },
         )
         : Container();
   }
