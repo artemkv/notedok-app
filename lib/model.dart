@@ -269,6 +269,28 @@ class NoteEditorModel extends Model {
 class SavingNewNoteModel extends Model {}
 
 @immutable
+class SavingNewNoteFailedModel implements Model {
+  final String title;
+  final String text;
+  final String reason;
+
+  const SavingNewNoteFailedModel(this.title, this.text, this.reason);
+}
+
+@immutable
+class SavingNewNoteWithUniquePathFailedModel implements Model {
+  final String path;
+  final String text;
+  final String reason;
+
+  const SavingNewNoteWithUniquePathFailedModel(
+    this.path,
+    this.text,
+    this.reason,
+  );
+}
+
+@immutable
 class SavingNoteModel extends Model {
   final NotePageViewSavedState pageViewSavedState;
 

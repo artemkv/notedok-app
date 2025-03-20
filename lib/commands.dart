@@ -228,18 +228,19 @@ class LoadNoteContent implements Command {
 
   @override
   void execute(void Function(Message) dispatch) async {
-    final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
-    if (session.isSignedIn) {
-      var idToken = session.userPoolTokensResult.value.idToken;
+    try {
+      final session =
+          await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+      if (session.isSignedIn) {
+        var idToken = session.userPoolTokensResult.value.idToken;
 
-      try {
         var text = await preloader.getContent(fileName, () {
           return getFile(fileName, () => Future.value(idToken.raw));
         });
         dispatch(NotePageViewNoteContentLoaded(fileName, text));
-      } catch (err) {
-        dispatch(NotePageViewNoteContentLoadingFailed(err.toString()));
       }
+    } catch (err) {
+      dispatch(NotePageViewNoteContentLoadingFailed(err.toString()));
     }
   }
 }
@@ -303,37 +304,69 @@ class SaveNewNote implements Command {
 
   @override
   void execute(void Function(Message) dispatch) async {
-    final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
-    if (session.isSignedIn) {
-      var idToken = session.userPoolTokensResult.value.idToken;
+    try {
+      final session =
+          await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+      if (session.isSignedIn) {
+        var idToken = session.userPoolTokensResult.value.idToken;
 
-      String path;
-      if (title.isEmpty) {
-        path = generatePathFromTitle("", true);
-      } else {
-        path = generatePathFromTitle(title, false);
-      }
-
-      try {
-        // Don't overwrite, in case not unique
-        await postFile(path, text, () => Future.value(idToken.raw));
-      } catch (err) {
-        if (err is RestApiException && err.statusCode == 409) {
-          // Regenerate path from title, this time enfocing uniqueness
-          path = generatePathFromTitle(title, true);
-          try {
-            await putFile(path, text, () => Future.value(idToken.raw));
-          } catch (err) {
-            // TODO: dispatch failed
-            // TODO: think about retry carefully
-          }
+        String path;
+        if (title.isEmpty) {
+          path = generatePathFromTitle("", true);
         } else {
-          // TODO: dispatch failed
-          // TODO: think about retry carefully
+          path = generatePathFromTitle(title, false);
         }
-      }
 
-      dispatch(NewNoteSaved());
+        try {
+          // Don't overwrite, in case not unique
+          await postFile(path, text, () => Future.value(idToken.raw));
+        } catch (err) {
+          if (err is RestApiException && err.statusCode == 409) {
+            // Regenerate path from title, this time enfocing uniqueness
+            path = generatePathFromTitle(title, true);
+            try {
+              await putFile(path, text, () => Future.value(idToken.raw));
+            } catch (err) {
+              dispatch(
+                SavingNewNoteWithUniquePathFailed(path, text, err.toString()),
+              );
+              return;
+            }
+          } else {
+            dispatch(SavingNewNoteFailed(title, text, err.toString()));
+            return;
+          }
+        }
+
+        // Here we forget about the path, since we will re-load all notes anyway
+        dispatch(NewNoteSaved());
+      }
+    } catch (err) {
+      dispatch(SavingNewNoteFailed(title, text, err.toString()));
+    }
+  }
+}
+
+@immutable
+class SaveNewNoteWithUniquePath implements Command {
+  final String path;
+  final String text;
+
+  const SaveNewNoteWithUniquePath(this.path, this.text);
+
+  @override
+  void execute(void Function(Message) dispatch) async {
+    try {
+      final session =
+          await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+      if (session.isSignedIn) {
+        var idToken = session.userPoolTokensResult.value.idToken;
+
+        await putFile(path, text, () => Future.value(idToken.raw));
+        dispatch(NewNoteSaved());
+      }
+    } catch (err) {
+      dispatch(SavingNewNoteWithUniquePathFailed(path, text, err.toString()));
     }
   }
 }

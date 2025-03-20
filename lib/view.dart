@@ -51,6 +51,12 @@ Widget home(
   if (model is SavingNewNoteModel) {
     return savingNote(context, dispatch);
   }
+  if (model is SavingNewNoteFailedModel) {
+    return savingNewNoteFailed(context, model, dispatch);
+  }
+  if (model is SavingNewNoteWithUniquePathFailedModel) {
+    return savingNewNoteWithUniquePathFailed(context, model, dispatch);
+  }
   if (model is SavingNoteModel) {
     return savingNote(context, dispatch);
   }
@@ -593,5 +599,120 @@ Widget savingNote(BuildContext context, void Function(Message) dispatch) {
     drawer: drawer(context, dispatch),
     body: Center(child: spinner()),
     backgroundColor: Colors.white,
+  );
+}
+
+Widget savingNewNoteFailed(
+  BuildContext context,
+  SavingNewNoteFailedModel model,
+  void Function(Message) dispatch,
+) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text(
+        'Failed to save note',
+        style: GoogleFonts.openSans(
+          textStyle: const TextStyle(color: Colors.white),
+          fontSize: textFontSize,
+        ),
+      ),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      foregroundColor: Colors.white,
+    ),
+    body: Center(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(textPadding),
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                "Failed to save note: ${model.reason}",
+                style: GoogleFonts.openSans(
+                  textStyle: TextStyle(
+                    fontSize: textFontSize,
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () {
+                dispatch(SaveNewNoteRetryRequested(model.title, model.text));
+              },
+              child: const Center(
+                child: Text(
+                  "Click to re-try",
+                  style: TextStyle(fontSize: textFontSize, color: Colors.grey),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget savingNewNoteWithUniquePathFailed(
+  BuildContext context,
+  SavingNewNoteWithUniquePathFailedModel model,
+  void Function(Message) dispatch,
+) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text(
+        'Failed to save note',
+        style: GoogleFonts.openSans(
+          textStyle: const TextStyle(color: Colors.white),
+          fontSize: textFontSize,
+        ),
+      ),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      foregroundColor: Colors.white,
+    ),
+    body: Center(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(textPadding),
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                "Failed to save note: ${model.reason}",
+                style: GoogleFonts.openSans(
+                  textStyle: TextStyle(
+                    fontSize: textFontSize,
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () {
+                dispatch(
+                  SavingNewNoteWithUniquePathRetryRequested(
+                    model.path,
+                    model.text,
+                  ),
+                );
+              },
+              child: const Center(
+                child: Text(
+                  "Click to re-try",
+                  style: TextStyle(fontSize: textFontSize, color: Colors.grey),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
   );
 }

@@ -160,6 +160,40 @@ class SaveNewNoteRequested implements Message {
 class NewNoteSaved implements Message {}
 
 @immutable
+class SavingNewNoteFailed implements Message {
+  final String title;
+  final String text;
+  final String reason;
+
+  const SavingNewNoteFailed(this.title, this.text, this.reason);
+}
+
+@immutable
+class SaveNewNoteRetryRequested implements Message {
+  final String title;
+  final String text;
+
+  const SaveNewNoteRetryRequested(this.title, this.text);
+}
+
+@immutable
+class SavingNewNoteWithUniquePathFailed implements Message {
+  final String path;
+  final String text;
+  final String reason;
+
+  const SavingNewNoteWithUniquePathFailed(this.path, this.text, this.reason);
+}
+
+@immutable
+class SavingNewNoteWithUniquePathRetryRequested implements Message {
+  final String path;
+  final String text;
+
+  const SavingNewNoteWithUniquePathRetryRequested(this.path, this.text);
+}
+
+@immutable
 class EditNoteRequested implements Message {
   final Note note;
 
@@ -184,4 +218,11 @@ class NoteSaved implements Message {
   final Note note;
 
   const NoteSaved(this.note);
+}
+
+@immutable
+class SavingNoteFailed implements Message {
+  final String reason;
+
+  const SavingNoteFailed(this.reason);
 }

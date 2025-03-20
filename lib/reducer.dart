@@ -312,6 +312,32 @@ ModelAndCommand reduce(Model model, Message message) {
   if (message is NewNoteSaved) {
     return ModelAndCommand(RetrievingFileListModel(""), RetrieveFileList(""));
   }
+  if (message is SavingNewNoteFailed) {
+    return ModelAndCommand.justModel(
+      SavingNewNoteFailedModel(message.title, message.text, message.reason),
+    );
+  }
+  if (message is SavingNewNoteWithUniquePathFailed) {
+    return ModelAndCommand.justModel(
+      SavingNewNoteWithUniquePathFailedModel(
+        message.path,
+        message.text,
+        message.reason,
+      ),
+    );
+  }
+  if (message is SaveNewNoteRetryRequested) {
+    return ModelAndCommand(
+      SavingNewNoteModel(),
+      SaveNewNote(message.title, message.text),
+    );
+  }
+  if (message is SavingNewNoteWithUniquePathRetryRequested) {
+    return ModelAndCommand(
+      SavingNewNoteModel(),
+      SaveNewNoteWithUniquePath(message.path, message.text),
+    );
+  }
 
   if (message is EditNoteRequested) {
     if (model is NotePageViewModel) {
