@@ -1,7 +1,18 @@
 const titlePostfixSeparator = "~~";
 
+bool isMarkdownFile(String path) {
+  return path.endsWith(".md");
+}
+
 String getTitleFromPath(String path) {
-  String title = path.substring(0, path.length - 4);
+  String title = "";
+  if (path.endsWith(".txt")) {
+    title = path.substring(0, path.length - 4);
+  } else if (path.endsWith(".md")) {
+    title = path.substring(0, path.length - 3);
+  } else {
+    throw "unknown file type";
+  }
 
   int separatorIndex = title.lastIndexOf(titlePostfixSeparator);
   if (separatorIndex >= 0) {
@@ -13,7 +24,7 @@ String getTitleFromPath(String path) {
   return title;
 }
 
-String generatePathFromTitle(String title, bool ensureUnique) {
+String generatePathFromTitleText(String title, bool ensureUnique) {
   String postfix = "";
   if (ensureUnique) {
     var date = DateTime.now();
@@ -21,6 +32,16 @@ String generatePathFromTitle(String title, bool ensureUnique) {
     postfix = titlePostfixSeparator + n.toString();
   }
   return "${encodePathFileSystemFriendly(title)}$postfix.txt";
+}
+
+String generatePathFromTitleMd(String title, bool ensureUnique) {
+  String postfix = "";
+  if (ensureUnique) {
+    var date = DateTime.now();
+    int n = date.millisecondsSinceEpoch;
+    postfix = titlePostfixSeparator + n.toString();
+  }
+  return "${encodePathFileSystemFriendly(title)}$postfix.md";
 }
 
 String encodePathFileSystemFriendly(String path) {

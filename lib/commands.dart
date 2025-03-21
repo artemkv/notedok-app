@@ -96,6 +96,7 @@ class RetrieveFileList implements Command {
           files.addAll(getFilesResponse.files);
         }
 
+        // Apply search string and sort by newest first
         var filesFiltered =
             files
                 .where(
@@ -295,6 +296,7 @@ class InvalidatePreloadedContent implements Command {
   }
 }
 
+// New notes are created as .md
 @immutable
 class SaveNewNote implements Command {
   final String title;
@@ -312,9 +314,9 @@ class SaveNewNote implements Command {
 
         String path;
         if (title.isEmpty) {
-          path = generatePathFromTitle("", true);
+          path = generatePathFromTitleMd("", true);
         } else {
-          path = generatePathFromTitle(title, false);
+          path = generatePathFromTitleMd(title, false);
         }
 
         try {
@@ -323,7 +325,7 @@ class SaveNewNote implements Command {
         } catch (err) {
           if (err is RestApiException && err.statusCode == 409) {
             // Regenerate path from title, this time enfocing uniqueness
-            path = generatePathFromTitle(title, true);
+            path = generatePathFromTitleMd(title, true);
             try {
               await putFile(path, text, () => Future.value(idToken.raw));
             } catch (err) {
@@ -371,6 +373,8 @@ class SaveNewNoteWithUniquePath implements Command {
   }
 }
 
+// Saving existing note doesn't change the file format
+// (.md is renamed to .md, .txt to .txt)
 @immutable
 class SaveNote implements Command {
   final String path;
@@ -392,11 +396,16 @@ class SaveNote implements Command {
         // First save text
         await putFile(path, text, () => Future.value(idToken.raw));
 
+        var isMarkdown = isMarkdownFile(path);
+
         // Now rename, if needed
         if (title != oldTitle) {
           // First time try with path derived from title
           // Unless title is empty, in which case we immediately ask for a unique one
-          String newPath = generatePathFromTitle(title, title.isEmpty);
+          String newPath =
+              isMarkdown
+                  ? generatePathFromTitleMd(title, title.isEmpty)
+                  : generatePathFromTitleText(title, title.isEmpty);
 
           try {
             await renameFile(path, newPath, () => Future.value(idToken.raw));
@@ -404,7 +413,10 @@ class SaveNote implements Command {
           } catch (err) {
             if (err is RestApiException && err.statusCode == 409) {
               // Regenerate path from title, this time focing uniqueness
-              newPath = generatePathFromTitle(title, true);
+              newPath =
+                  isMarkdown
+                      ? generatePathFromTitleMd(title, true)
+                      : generatePathFromTitleText(title, true);
               try {
                 await renameFile(
                   path,
@@ -442,6 +454,10 @@ class SaveNote implements Command {
   }
 }
 
+// This can only happen upon retry,
+// since the saving and renaming is normally combined
+// Renaming doesn't change the file format
+// (.md is renamed to .md, .txt to .txt)
 @immutable
 class RenameNote implements Command {
   final String path;
@@ -465,7 +481,11 @@ class RenameNote implements Command {
         } catch (err) {
           if (err is RestApiException && err.statusCode == 409) {
             // Regenerate path from title, this time focing uniqueness
-            String newUniquePath = generatePathFromTitle(title, true);
+            var isMarkdown = isMarkdownFile(path);
+            String newUniquePath =
+                isMarkdown
+                    ? generatePathFromTitleMd(title, true)
+                    : generatePathFromTitleText(title, true);
             try {
               await renameFile(
                 path,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:notedok/conversions.dart';
 import 'package:notedok/custom_components.dart';
 import 'package:notedok/domain.dart';
 import 'package:notedok/formatting.dart';
@@ -8,6 +9,7 @@ import 'package:notedok/messages.dart';
 import 'package:notedok/model.dart';
 import 'package:notedok/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:markdown/markdown.dart' as md;
 
 // These should be all stateless! No side effects allowed!
 
@@ -595,9 +597,21 @@ class NoteView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return model.currentFileIdx == pageIdx
-        ? Markdown(
-          data:
-              "# ${model.note.title}\n\n${LegacyWikiToMdFormatter().format(model.note.text)}",
+        ? markdownConverter(
+          isMarkdownFile(model.note.fileName),
+          model.note.title,
+          model.note.text,
+        )
+        : Container();
+  }
+}
+
+Widget markdownConverter(bool isMarkdown, String title, String text) {
+  return isMarkdown
+      ? SelectionArea(
+        child: Markdown(
+          data: "# $title\n\n$text",
+          styleSheet: MarkdownStyleSheet(),
           onTapLink: (text, href, title) {
             if (href != null) {
               try {
@@ -608,9 +622,34 @@ class NoteView extends StatelessWidget {
               }
             }
           },
-        )
-        : Container();
-  }
+          extensionSet: md.ExtensionSet(
+            md.ExtensionSet.gitHubFlavored.blockSyntaxes,
+            md.ExtensionSet.gitHubFlavored.inlineSyntaxes,
+          ),
+          selectable: false,
+        ),
+      )
+      : SelectionArea(
+        child: Markdown(
+          data: "# $title (.txt)\n\n${LegacyWikiToMdFormatter().format(text)}",
+          styleSheet: MarkdownStyleSheet(),
+          onTapLink: (text, href, title) {
+            if (href != null) {
+              try {
+                var parsedUrl = Uri.parse(href);
+                launchUrl(parsedUrl);
+              } catch (err) {
+                // Ignore
+              }
+            }
+          },
+          extensionSet: md.ExtensionSet(
+            md.ExtensionSet.gitHubFlavored.blockSyntaxes,
+            md.ExtensionSet.gitHubFlavored.inlineSyntaxes,
+          ),
+          selectable: false,
+        ),
+      );
 }
 
 Widget savingNote(BuildContext context, void Function(Message) dispatch) {
