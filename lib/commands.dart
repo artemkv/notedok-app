@@ -556,3 +556,23 @@ class RenameNoteWithUniquePath implements Command {
     }
   }
 }
+
+@immutable
+class DeleteAccount implements Command {
+  @override
+  void execute(void Function(Message) dispatch) async {
+    try {
+      final session =
+          await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+      if (session.isSignedIn) {
+        var idToken = session.userPoolTokensResult.value.idToken;
+
+        await deleteAllFiles(() => Future.value(idToken.raw));
+        killSession();
+        await Amplify.Auth.deleteUser();
+      }
+    } catch (err) {
+      dispatch(DeletingAccountFailed(err.toString()));
+    }
+  }
+}

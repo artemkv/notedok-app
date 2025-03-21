@@ -319,3 +319,28 @@ class RenamingNoteWithUniquePathRetryRequested implements Message {
     this.text,
   );
 }
+
+@immutable
+class NavigateToAppSettingsRequested implements Message {}
+
+@immutable
+class CancelEditingAppSettingsRequested implements Message {}
+
+@immutable
+class AccountDeletionRequested implements Message {}
+
+@immutable
+class AccountDeletionCanceled implements Message {}
+
+@immutable
+class AccountDeletionConfirmed implements Message {}
+
+@immutable
+class DeletingAccountFailed implements Message {
+  final String reason;
+
+  const DeletingAccountFailed(this.reason);
+}
+
+@immutable
+class AccountDeletionRetryRequested implements Message {}

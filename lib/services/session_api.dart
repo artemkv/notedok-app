@@ -91,3 +91,7 @@ Future<String> deleteFile(
 ) {
   return callApi(() => rest.deleteFile(fileName, session), getIdToken);
 }
+
+Future<String> deleteAllFiles(Future<String> Function() getIdToken) {
+  return callApi(() => rest.deleteAllFiles(session), getIdToken);
+}

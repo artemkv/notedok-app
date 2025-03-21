@@ -486,5 +486,29 @@ ModelAndCommand reduce(Model model, Message message) {
     }
   }
 
+  if (message is NavigateToAppSettingsRequested) {
+    return ModelAndCommand.justModel(AppSettingsModel());
+  }
+  if (message is CancelEditingAppSettingsRequested) {
+    return ModelAndCommand(RetrievingFileListModel(""), RetrieveFileList(""));
+  }
+  if (message is AccountDeletionRequested) {
+    return ModelAndCommand.justModel(AccountDeletionConfirmationStateModel(""));
+  }
+  if (message is AccountDeletionCanceled) {
+    return ModelAndCommand(RetrievingFileListModel(""), RetrieveFileList(""));
+  }
+  if (message is AccountDeletionConfirmed) {
+    return ModelAndCommand(DeletingAccountModel(), DeleteAccount());
+  }
+  if (message is DeletingAccountFailed) {
+    return ModelAndCommand.justModel(
+      DeletingAccountFailedModel(message.reason),
+    );
+  }
+  if (message is AccountDeletionRetryRequested) {
+    return ModelAndCommand(DeletingAccountModel(), DeleteAccount());
+  }
+
   return ModelAndCommand.justModel(model);
 }

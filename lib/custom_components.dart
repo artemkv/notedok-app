@@ -419,3 +419,176 @@ class _NoteEditorState extends State<NoteEditor> {
     );
   }
 }
+
+// There is no state now, but since it's copy-paste, I leave it like this
+class AppSettingsEditor extends StatefulWidget {
+  final AppSettingsModel model;
+  final void Function(Message) dispatch;
+
+  const AppSettingsEditor({
+    super.key,
+    required this.model,
+    required this.dispatch,
+  });
+
+  @override
+  State<AppSettingsEditor> createState() => _AppSettingsEditorState();
+}
+
+class _AppSettingsEditorState extends State<AppSettingsEditor> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: const BackButton(),
+        title: Text(
+          'Settings',
+          style: GoogleFonts.openSans(
+            textStyle: TextStyle(color: Colors.white, fontSize: textFontSize),
+          ),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+      ),
+      body: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          widget.dispatch(CancelEditingAppSettingsRequested());
+        },
+        child: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(
+                left: 32,
+                right: 32,
+                top: 16,
+                bottom: 16,
+              ),
+              child: Text(
+                "Account data",
+                style: TextStyle(color: Colors.black, fontSize: textFontSize),
+              ),
+            ),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  widget.dispatch(AccountDeletionRequested());
+                },
+                child: const Text('DELETE ALL ACCOUNT DATA'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AccountDeletionConfirmationScreen extends StatefulWidget {
+  final AccountDeletionConfirmationStateModel model;
+  final void Function(Message) dispatch;
+
+  const AccountDeletionConfirmationScreen({
+    super.key,
+    required this.model,
+    required this.dispatch,
+  });
+
+  @override
+  State<AccountDeletionConfirmationScreen> createState() =>
+      _DataDeletionConfirmationScreen();
+}
+
+class _DataDeletionConfirmationScreen
+    extends State<AccountDeletionConfirmationScreen> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.text = widget.model.text;
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // TODO: single-source this app bar
+      appBar: AppBar(
+        leading: const BackButton(),
+        title: Text(
+          'Confirm data deletion',
+          style: GoogleFonts.openSans(
+            textStyle: TextStyle(color: Colors.white, fontSize: textFontSize),
+          ),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+      ),
+      body: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          widget.dispatch(AccountDeletionCanceled());
+        },
+        child: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(textPadding * 2),
+              child: Text(
+                "Type 'delete' then press 'DELETE'",
+                style: TextStyle(fontSize: textFontSize),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(
+                top: textPadding,
+                left: textPadding * 2,
+                right: textPadding * 2,
+                bottom: textPadding,
+              ),
+              child: TextField(
+                maxLength: 100,
+                controller: _controller,
+                autofocus: true,
+                style: const TextStyle(fontSize: textFontSize),
+                maxLines: 1,
+                keyboardType: TextInputType.multiline,
+                textCapitalization: TextCapitalization.none,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  hintText: 'delete',
+                ),
+              ),
+            ),
+            Center(
+              child: ValueListenableBuilder<TextEditingValue>(
+                valueListenable: _controller,
+                builder: (context, value, child) {
+                  return ElevatedButton(
+                    onPressed:
+                        value.text == "delete"
+                            ? () {
+                              widget.dispatch(AccountDeletionConfirmed());
+                            }
+                            : null,
+                    child: const Text("DELETE"),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -355,3 +355,23 @@ class RenamingNoteWithUniquePathFailedModel implements Model {
     this.reason,
   );
 }
+
+@immutable
+class AppSettingsModel extends Model {}
+
+@immutable
+class AccountDeletionConfirmationStateModel extends Model {
+  final String text;
+
+  const AccountDeletionConfirmationStateModel(this.text);
+}
+
+@immutable
+class DeletingAccountModel implements Model {}
+
+@immutable
+class DeletingAccountFailedModel extends Model {
+  final String reason;
+
+  const DeletingAccountFailedModel(this.reason);
+}

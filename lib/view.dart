@@ -73,6 +73,19 @@ Widget home(
     return renamingNoteWithUniquePathFailed(context, model, dispatch);
   }
 
+  if (model is AppSettingsModel) {
+    return AppSettingsEditor(model: model, dispatch: dispatch);
+  }
+  if (model is AccountDeletionConfirmationStateModel) {
+    return AccountDeletionConfirmationScreen(model: model, dispatch: dispatch);
+  }
+  if (model is DeletingAccountModel) {
+    return deletingAccount(context, model);
+  }
+  if (model is DeletingAccountFailedModel) {
+    return deletingAccountFailed(context, model, dispatch);
+  }
+
   return unknownModel(model);
 }
 
@@ -294,13 +307,26 @@ Widget drawer(BuildContext context, void Function(Message) dispatch) {
         ),
       ),
       const NavigationDrawerDestination(
+        icon: Icon(Icons.settings_outlined),
+        label: Text('Settings'),
+      ),
+      const NavigationDrawerDestination(
         icon: Icon(Icons.logout),
         label: Text('Sign out'),
       ),
     ],
     onDestinationSelected: (idx) {
+      // How moronic is it to dispatch by index?
+      // Be careful
       Navigator.pop(context);
-      dispatch(SignOutRequested());
+      if (idx == 0) {
+        dispatch(NavigateToAppSettingsRequested());
+        return;
+      }
+      if (idx == 1) {
+        dispatch(SignOutRequested());
+        return;
+      }
     },
   );
 }
@@ -960,5 +986,77 @@ Widget renamingNoteWithUniquePathFailed(
         ],
       ),
     ),
+  );
+}
+
+Widget deletingAccountFailed(
+  BuildContext context,
+  DeletingAccountFailedModel model,
+  void Function(Message) dispatch,
+) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text(
+        'Failed to delete account',
+        style: GoogleFonts.openSans(
+          textStyle: const TextStyle(color: Colors.white),
+          fontSize: textFontSize,
+        ),
+      ),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      foregroundColor: Colors.white,
+    ),
+    body: Center(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(textPadding),
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                "Failed to delete account: ${model.reason}",
+                style: GoogleFonts.openSans(
+                  textStyle: TextStyle(
+                    fontSize: textFontSize,
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () {
+                dispatch(AccountDeletionRetryRequested());
+              },
+              child: const Center(
+                child: Text(
+                  "Click to re-try",
+                  style: TextStyle(fontSize: textFontSize, color: Colors.grey),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget deletingAccount(BuildContext context, DeletingAccountModel model) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text(
+        'Deleting user account',
+        style: GoogleFonts.openSans(
+          textStyle: const TextStyle(color: Colors.white),
+          fontSize: textFontSize,
+        ),
+      ),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      foregroundColor: Colors.white,
+    ),
+    body: Center(child: spinner()),
   );
 }

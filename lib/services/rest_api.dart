@@ -212,3 +212,13 @@ Future<String> deleteFile(String fileName, String session) async {
   var response = await delete('/files/$encodedFileName', session);
   return response.body; // actually ignored
 }
+
+Future<String> deleteAllFiles(String session) async {
+  var response = await post(
+    '/deleteall',
+    jsonEncode({}),
+    contentTypeJson,
+    session,
+  );
+  return response.body; // actually ignored
+}
