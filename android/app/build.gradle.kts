@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "net.artemkv.notedok"
+    namespace = "com.notedok.notedok"
     compileSdk = 35
     ndkVersion = "27.0.12077973"
 
@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "net.artemkv.notedok"
+        applicationId = "com.notedok.notedok"
         minSdk = 24
         targetSdk = 35
         versionCode = flutter.versionCode

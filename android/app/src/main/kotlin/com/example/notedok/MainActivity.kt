@@ -1,4 +1,4 @@
-package net.artemkv.notedok
+package com.notedok.notedok
 
 import io.flutter.embedding.android.FlutterActivity
 
