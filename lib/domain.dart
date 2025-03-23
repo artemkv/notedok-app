@@ -49,3 +49,11 @@ class Note {
   @override
   int get hashCode => Object.hash(fileName, title, text);
 }
+
+@immutable
+class GetFilesCachedResult {
+  final String searchString;
+  final List<FileData> files;
+
+  const GetFilesCachedResult(this.searchString, this.files);
+}

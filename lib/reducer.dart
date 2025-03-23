@@ -26,7 +26,7 @@ ModelAndCommand reduce(Model model, Message message) {
   if (message is SearchSubmitted) {
     return ModelAndCommand(
       RetrievingFileListModel(message.searchString),
-      RetrieveFileList(message.searchString),
+      RetrieveFileList(message.searchString, false),
     );
   }
 
@@ -53,7 +53,7 @@ ModelAndCommand reduce(Model model, Message message) {
   if (message is FileListReloadRequested) {
     return ModelAndCommand(
       RetrievingFileListModel(message.searchString),
-      RetrieveFileList(message.searchString),
+      RetrieveFileList(message.searchString, true),
     );
   }
   if (message is NoteListViewFirstBatchLoaded) {
@@ -199,7 +199,7 @@ ModelAndCommand reduce(Model model, Message message) {
     if (model is NoteListViewModel) {
       return ModelAndCommand(
         RetrievingFileListModel(model.searchString),
-        RetrieveFileList(model.searchString),
+        RetrieveFileList(model.searchString, true),
       );
     }
   }
@@ -221,7 +221,7 @@ ModelAndCommand reduce(Model model, Message message) {
     if (model is NotePageViewModel) {
       return ModelAndCommand(
         RetrievingFileListModel(model.searchString),
-        RetrieveFileList(model.searchString),
+        RetrieveFileList(model.searchString, false),
       );
     }
   }
@@ -310,7 +310,10 @@ ModelAndCommand reduce(Model model, Message message) {
     );
   }
   if (message is NewNoteSaved) {
-    return ModelAndCommand(RetrievingFileListModel(""), RetrieveFileList(""));
+    return ModelAndCommand(
+      RetrievingFileListModel(""),
+      RetrieveFileList("", true),
+    );
   }
   if (message is SavingNewNoteFailed) {
     return ModelAndCommand.justModel(
@@ -487,20 +490,26 @@ ModelAndCommand reduce(Model model, Message message) {
   }
 
   if (message is NavigateToNoteListRequested) {
-    ModelAndCommand(RetrievingFileListModel(""), RetrieveFileList(""));
+    ModelAndCommand(RetrievingFileListModel(""), RetrieveFileList("", true));
   }
 
   if (message is NavigateToAppSettingsRequested) {
     return ModelAndCommand.justModel(AppSettingsModel());
   }
   if (message is CancelEditingAppSettingsRequested) {
-    return ModelAndCommand(RetrievingFileListModel(""), RetrieveFileList(""));
+    return ModelAndCommand(
+      RetrievingFileListModel(""),
+      RetrieveFileList("", false),
+    );
   }
   if (message is AccountDeletionRequested) {
     return ModelAndCommand.justModel(AccountDeletionConfirmationStateModel(""));
   }
   if (message is AccountDeletionCanceled) {
-    return ModelAndCommand(RetrievingFileListModel(""), RetrieveFileList(""));
+    return ModelAndCommand(
+      RetrievingFileListModel(""),
+      RetrieveFileList("", false),
+    );
   }
   if (message is AccountDeletionConfirmed) {
     return ModelAndCommand(DeletingAccountModel(), DeleteAccount());

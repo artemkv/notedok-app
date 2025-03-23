@@ -14,6 +14,12 @@ import 'package:notedok/services/session_api.dart';
 
 Preloader preloader = Preloader();
 
+GetFilesCachedResult? getFilesCachedResult;
+
+clearAllCaches() {
+  getFilesCachedResult = null;
+}
+
 @immutable
 abstract class Command {
   void execute(void Function(Message) dispatch);
@@ -23,7 +29,7 @@ abstract class Command {
   }
 
   static Command getInitialCommand() {
-    return RetrieveFileList("");
+    return RetrieveFileList("", true);
   }
 }
 
@@ -51,6 +57,7 @@ class CommandList implements Command {
 class SignOut implements Command {
   @override
   void execute(void Function(Message) dispatch) async {
+    clearAllCaches();
     killSession();
     await Amplify.Auth.signOut();
   }
@@ -60,8 +67,9 @@ class SignOut implements Command {
 class RetrieveFileList implements Command {
   final int pageSize = 1000;
   final String searchString;
+  final bool forceReload;
 
-  const RetrieveFileList(this.searchString);
+  const RetrieveFileList(this.searchString, this.forceReload);
 
   @override
   void execute(void Function(Message) dispatch) async {
@@ -76,24 +84,34 @@ class RetrieveFileList implements Command {
 
         List<FileData> files = [];
 
-        // Retrieve the first batch
-        var json = await getFiles(
-          pageSize,
-          "",
-          () => Future.value(idToken.raw),
-        );
-        var getFilesResponse = GetFilesResponse.fromJson(json);
-        files.addAll(getFilesResponse.files);
-
-        // Keep retrieving until all
-        while (getFilesResponse.hasMore) {
-          json = await getFiles(
+        // Try cache first
+        if (!forceReload &&
+            getFilesCachedResult != null &&
+            getFilesCachedResult!.searchString == searchString) {
+          files = getFilesCachedResult!.files;
+        } else {
+          // Retrieve the first batch
+          var json = await getFiles(
             pageSize,
-            getFilesResponse.nextContinuationToken,
+            "",
             () => Future.value(idToken.raw),
           );
-          getFilesResponse = GetFilesResponse.fromJson(json);
+          var getFilesResponse = GetFilesResponse.fromJson(json);
           files.addAll(getFilesResponse.files);
+
+          // Keep retrieving until all
+          while (getFilesResponse.hasMore) {
+            json = await getFiles(
+              pageSize,
+              getFilesResponse.nextContinuationToken,
+              () => Future.value(idToken.raw),
+            );
+            getFilesResponse = GetFilesResponse.fromJson(json);
+            files.addAll(getFilesResponse.files);
+          }
+
+          // Cache the results
+          getFilesCachedResult = GetFilesCachedResult(searchString, files);
         }
 
         // Apply search string and sort by newest first
@@ -568,6 +586,7 @@ class DeleteAccount implements Command {
         var idToken = session.userPoolTokensResult.value.idToken;
 
         await deleteAllFiles(() => Future.value(idToken.raw));
+        clearAllCaches();
         killSession();
         await Amplify.Auth.deleteUser();
       }
