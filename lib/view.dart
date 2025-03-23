@@ -498,7 +498,7 @@ Widget noteListItemDeletedNote(Note note, void Function(Message) dispatch) {
               iconSize: textFontSize,
               onSelected: (action) {
                 if (action == NoteListItemContextAction.restore) {
-                  //dispatch(NoteListViewDeleteNoteRequested(note, noteIdx));
+                  dispatch(NoteListViewRestoreNoteRequested(note));
                 }
               },
               itemBuilder:
@@ -532,6 +532,55 @@ Widget noteListItemRetryDeletingNote(
           padding: const EdgeInsets.all(textPadding),
           child: Text(
             "Failed to delete note: $reason",
+            style: const TextStyle(fontSize: textFontSize, color: Colors.red),
+          ),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Text(
+                    "Click to re-try",
+                    style: GoogleFonts.openSans(
+                      textStyle: const TextStyle(
+                        fontSize: textFontSize,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
+Widget noteListItemRestoringNote() {
+  return SizedBox(height: listItemHeight / 2, child: spinner());
+}
+
+Widget noteListItemRetryRestoringNote(
+  Note note,
+  String reason,
+  void Function(Message) dispatch,
+) {
+  return GestureDetector(
+    behavior: HitTestBehavior.translucent,
+    onTap: () {
+      dispatch(NoteListViewRetryRestoringNoteRequested(note));
+    },
+    child: Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(textPadding),
+          child: Text(
+            "Failed to restore note: $reason",
             style: const TextStyle(fontSize: textFontSize, color: Colors.red),
           ),
         ),

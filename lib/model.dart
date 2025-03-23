@@ -176,6 +176,37 @@ class NoteListItemRetryDeletingNote extends NoteListItem {
 }
 
 @immutable
+class NoteListItemRestoringNote extends NoteListItem {
+  final Note note;
+
+  const NoteListItemRestoringNote(this.note);
+
+  @override
+  bool operator ==(Object other) {
+    return other is NoteListItemRestoringNote && note == other.note;
+  }
+
+  @override
+  int get hashCode => note.hashCode;
+}
+
+@immutable
+class NoteListItemRetryRestoringNote extends NoteListItem {
+  final Note note;
+  final String reason;
+
+  const NoteListItemRetryRestoringNote(this.note, this.reason);
+
+  @override
+  bool operator ==(Object other) {
+    return other is NoteListItemRetryRestoringNote && note == other.note;
+  }
+
+  @override
+  int get hashCode => note.hashCode;
+}
+
+@immutable
 class NoteListItemLoadMoreTrigger extends NoteListItem {
   @override
   bool operator ==(Object other) {

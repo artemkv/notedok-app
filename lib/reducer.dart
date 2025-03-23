@@ -298,6 +298,100 @@ ModelAndCommand reduce(Model model, Message message) {
     }
   }
 
+  if (message is NoteListViewRestoreNoteRequested) {
+    if (model is NoteListViewModel) {
+      var updatedItems =
+          model.items.map((listItem) {
+            if (listItem is NoteListItemDeletedNote) {
+              if (listItem.note == message.note) {
+                return NoteListItemRestoringNote(message.note);
+              }
+            }
+            return listItem;
+          }).toList();
+
+      return ModelAndCommand(
+        NoteListViewModel(
+          model.searchString,
+          model.files,
+          model.unprocessedFiles,
+          updatedItems,
+        ),
+        RestoreNote(message.note),
+      );
+    }
+  }
+  if (message is NoteListViewNoteRestored) {
+    if (model is NoteListViewModel) {
+      var updatedItems =
+          model.items.map((listItem) {
+            if (listItem is NoteListItemRestoringNote) {
+              if (listItem.note == message.note) {
+                return NoteListItemNote(message.note);
+              }
+            }
+            return listItem;
+          }).toList();
+
+      return ModelAndCommand.justModel(
+        NoteListViewModel(
+          model.searchString,
+          model.files,
+          model.unprocessedFiles,
+          updatedItems,
+        ),
+      );
+    }
+  }
+  if (message is NoteListViewRestoringNoteFailed) {
+    if (model is NoteListViewModel) {
+      var updatedItems =
+          model.items.map((listItem) {
+            if (listItem is NoteListItemRestoringNote) {
+              if (listItem.note == message.note) {
+                return NoteListItemRetryRestoringNote(
+                  message.note,
+                  message.reason,
+                );
+              }
+            }
+            return listItem;
+          }).toList();
+
+      return ModelAndCommand.justModel(
+        NoteListViewModel(
+          model.searchString,
+          model.files,
+          model.unprocessedFiles,
+          updatedItems,
+        ),
+      );
+    }
+  }
+  if (message is NoteListViewRetryRestoringNoteRequested) {
+    if (model is NoteListViewModel) {
+      var updatedItems =
+          model.items.map((listItem) {
+            if (listItem is NoteListItemRetryRestoringNote) {
+              if (listItem.note == message.note) {
+                return NoteListItemRestoringNote(message.note);
+              }
+            }
+            return listItem;
+          }).toList();
+
+      return ModelAndCommand(
+        NoteListViewModel(
+          model.searchString,
+          model.files,
+          model.unprocessedFiles,
+          updatedItems,
+        ),
+        RestoreNote(message.note),
+      );
+    }
+  }
+
   if (message is NoteListViewMoveToPageView) {
     if (model is NoteListViewModel) {
       return ModelAndCommand(

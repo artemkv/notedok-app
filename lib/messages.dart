@@ -376,3 +376,32 @@ class NoteListViewDeletingNoteFailed implements Message {
 
   const NoteListViewDeletingNoteFailed(this.note, this.reason);
 }
+
+@immutable
+class NoteListViewRestoreNoteRequested implements Message {
+  final Note note;
+
+  const NoteListViewRestoreNoteRequested(this.note);
+}
+
+@immutable
+class NoteListViewRetryRestoringNoteRequested implements Message {
+  final Note note;
+
+  const NoteListViewRetryRestoringNoteRequested(this.note);
+}
+
+@immutable
+class NoteListViewNoteRestored implements Message {
+  final Note note;
+
+  const NoteListViewNoteRestored(this.note);
+}
+
+@immutable
+class NoteListViewRestoringNoteFailed implements Message {
+  final Note note;
+  final String reason;
+
+  const NoteListViewRestoringNoteFailed(this.note, this.reason);
+}

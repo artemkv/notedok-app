@@ -193,6 +193,16 @@ class _NoteListState extends State<NoteList> {
             widget.dispatch,
           );
         }
+        if (item is NoteListItemRestoringNote) {
+          return noteListItemRestoringNote();
+        }
+        if (item is NoteListItemRetryRestoringNote) {
+          return noteListItemRetryRestoringNote(
+            item.note,
+            item.reason,
+            widget.dispatch,
+          );
+        }
 
         throw "Unknown type of NoteListItem";
       },

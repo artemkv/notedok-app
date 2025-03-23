@@ -615,3 +615,23 @@ class DeleteNote implements Command {
     });
   }
 }
+
+@immutable
+class RestoreNote implements Command {
+  final Note note;
+
+  const RestoreNote(this.note);
+
+  @override
+  void execute(void Function(Message) dispatch) async {
+    Future.delayed(Duration(seconds: 1), () {
+      /*dispatch(
+        NoteListViewRestoringNoteFailed(
+          note,
+          "Failed to restore " + note.title,
+        ),
+      );*/
+      dispatch(NoteListViewNoteRestored(note));
+    });
+  }
+}
