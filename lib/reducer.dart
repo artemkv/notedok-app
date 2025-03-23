@@ -245,7 +245,8 @@ ModelAndCommand reduce(Model model, Message message) {
       return ModelAndCommand.justModel(
         NoteListViewModel(
           model.searchString,
-          // TODO: at this point, we have a filename for a note that has been deleted here
+          // Note that the file list does not get updated
+          // So some of the files correspond to deleted notes
           model.files,
           model.unprocessedFiles,
           updatedItems,
@@ -501,6 +502,7 @@ ModelAndCommand reduce(Model model, Message message) {
       return ModelAndCommand(
         NotePageViewModel(
           model.searchString,
+          // TODO: indicate that file is deleted
           model.files,
           message.noteIdx,
           message.note,
