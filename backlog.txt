@@ -1,6 +1,6 @@
 Everywhere:
 - --covert filenames to titles--
-- icon
+- --icon--
 
 List view:
 - --swipe down to reload--
@@ -38,6 +38,7 @@ Delete note:
 Optimizations:
 - --load all notes in a batch in parallel--
 - --preload notes that are most likely to be loaded soon--
+- --cache get files result until reload--
 - cache by etag??
 
 Auto-suggest
