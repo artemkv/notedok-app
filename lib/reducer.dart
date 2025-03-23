@@ -486,6 +486,10 @@ ModelAndCommand reduce(Model model, Message message) {
     }
   }
 
+  if (message is NavigateToNoteListRequested) {
+    ModelAndCommand(RetrievingFileListModel(""), RetrieveFileList(""));
+  }
+
   if (message is NavigateToAppSettingsRequested) {
     return ModelAndCommand.justModel(AppSettingsModel());
   }

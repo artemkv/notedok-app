@@ -16,6 +16,10 @@ import 'package:markdown/markdown.dart' as md;
 const textPadding = 12.0;
 const textFontSize = 16.0;
 
+const navigationNoteList = 0;
+const navigationSettings = 1;
+const navigationSignOut = 2;
+
 Widget home(
   BuildContext context,
   Model model,
@@ -144,7 +148,7 @@ Widget retrievingFileList(
 ) {
   return Scaffold(
     appBar: defaultAppBar(model.searchString, context),
-    drawer: drawer(context, dispatch),
+    drawer: drawer(context, navigationNoteList, dispatch),
     body: Center(child: spinner()),
     backgroundColor: Colors.white,
   );
@@ -157,7 +161,7 @@ Widget fileListRetrieved(
 ) {
   return Scaffold(
     appBar: defaultAppBar(model.searchString, context),
-    drawer: drawer(context, dispatch),
+    drawer: drawer(context, navigationNoteList, dispatch),
     body: Center(child: spinner()),
     backgroundColor: Colors.white,
   );
@@ -278,33 +282,18 @@ Widget noteListViewLoadingFirstBatchFailed(
   );
 }
 
-Widget drawer(BuildContext context, void Function(Message) dispatch) {
+Widget drawer(
+  BuildContext context,
+  int selectedIndex,
+  void Function(Message) dispatch,
+) {
   return NavigationDrawer(
+    backgroundColor: lightGrey,
+    selectedIndex: selectedIndex,
     children: <Widget>[
-      DrawerHeader(
-        decoration: BoxDecoration(color: pink),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(2.0),
-              child: Text(
-                "NotedOK",
-                style: TextStyle(fontSize: textFontSize, color: Colors.white),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(2.0),
-              child: Text(
-                "Access your notes anywhere",
-                style: TextStyle(
-                  fontSize: textFontSize * 0.8,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
-        ),
+      const NavigationDrawerDestination(
+        icon: Icon(Icons.list),
+        label: Text('Note list'),
       ),
       const NavigationDrawerDestination(
         icon: Icon(Icons.settings_outlined),
@@ -319,11 +308,15 @@ Widget drawer(BuildContext context, void Function(Message) dispatch) {
       // How moronic is it to dispatch by index?
       // Be careful
       Navigator.pop(context);
-      if (idx == 0) {
+      if (idx == navigationNoteList) {
+        dispatch(NavigateToNoteListRequested());
+        return;
+      }
+      if (idx == navigationSettings) {
         dispatch(NavigateToAppSettingsRequested());
         return;
       }
-      if (idx == 1) {
+      if (idx == navigationSignOut) {
         dispatch(SignOutRequested());
         return;
       }
@@ -341,7 +334,7 @@ Widget noteListView(
       searchString: model.searchString,
       dispatch: dispatch,
     ),
-    drawer: drawer(context, dispatch),
+    drawer: drawer(context, navigationNoteList, dispatch),
     body: RefreshIndicator(
       onRefresh: () {
         dispatch(NoteListViewReloadRequested());
@@ -688,7 +681,7 @@ Widget markdownConverter(bool isMarkdown, String title, String text) {
 Widget savingNote(BuildContext context, void Function(Message) dispatch) {
   return Scaffold(
     appBar: defaultAppBar("", context),
-    drawer: drawer(context, dispatch),
+    drawer: drawer(context, navigationNoteList, dispatch),
     body: Center(child: spinner()),
     backgroundColor: Colors.white,
   );

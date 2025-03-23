@@ -321,6 +321,9 @@ class RenamingNoteWithUniquePathRetryRequested implements Message {
 }
 
 @immutable
+class NavigateToNoteListRequested implements Message {}
+
+@immutable
 class NavigateToAppSettingsRequested implements Message {}
 
 @immutable
