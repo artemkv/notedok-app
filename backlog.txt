@@ -19,6 +19,7 @@ Page view:
 - --show counter--
 - --show error if cannot load--
 - --follow links--
+- Saving note with a different title is now requesting outdated note (maybe issue with cache)
 
 Editor:
 - --save new note--
@@ -39,6 +40,7 @@ Optimizations:
 - --load all notes in a batch in parallel--
 - --preload notes that are most likely to be loaded soon--
 - --cache get files result until reload--
+- The spinner is still spinning for way too long
 - cache by etag??
 
 Auto-suggest

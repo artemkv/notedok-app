@@ -204,6 +204,100 @@ ModelAndCommand reduce(Model model, Message message) {
     }
   }
 
+  if (message is NoteListViewDeleteNoteRequested) {
+    if (model is NoteListViewModel) {
+      var updatedItems =
+          model.items.map((listItem) {
+            if (listItem is NoteListItemNote) {
+              if (listItem.note == message.note) {
+                return NoteListItemDeletingNote(message.note);
+              }
+            }
+            return listItem;
+          }).toList();
+
+      return ModelAndCommand(
+        NoteListViewModel(
+          model.searchString,
+          model.files,
+          model.unprocessedFiles,
+          updatedItems,
+        ),
+        DeleteNote(message.note),
+      );
+    }
+  }
+  if (message is NoteListViewNoteDeleted) {
+    if (model is NoteListViewModel) {
+      var updatedItems =
+          model.items.map((listItem) {
+            if (listItem is NoteListItemDeletingNote) {
+              if (listItem.note == message.note) {
+                return NoteListItemDeletedNote(message.note);
+              }
+            }
+            return listItem;
+          }).toList();
+
+      return ModelAndCommand.justModel(
+        NoteListViewModel(
+          model.searchString,
+          model.files,
+          model.unprocessedFiles,
+          updatedItems,
+        ),
+      );
+    }
+  }
+  if (message is NoteListViewDeletingNoteFailed) {
+    if (model is NoteListViewModel) {
+      var updatedItems =
+          model.items.map((listItem) {
+            if (listItem is NoteListItemDeletingNote) {
+              if (listItem.note == message.note) {
+                return NoteListItemRetryDeletingNote(
+                  message.note,
+                  message.reason,
+                );
+              }
+            }
+            return listItem;
+          }).toList();
+
+      return ModelAndCommand.justModel(
+        NoteListViewModel(
+          model.searchString,
+          model.files,
+          model.unprocessedFiles,
+          updatedItems,
+        ),
+      );
+    }
+  }
+  if (message is NoteListViewRetryDeletingNoteRequested) {
+    if (model is NoteListViewModel) {
+      var updatedItems =
+          model.items.map((listItem) {
+            if (listItem is NoteListItemRetryDeletingNote) {
+              if (listItem.note == message.note) {
+                return NoteListItemDeletingNote(message.note);
+              }
+            }
+            return listItem;
+          }).toList();
+
+      return ModelAndCommand(
+        NoteListViewModel(
+          model.searchString,
+          model.files,
+          model.unprocessedFiles,
+          updatedItems,
+        ),
+        DeleteNote(message.note),
+      );
+    }
+  }
+
   if (message is NoteListViewMoveToPageView) {
     if (model is NoteListViewModel) {
       return ModelAndCommand(

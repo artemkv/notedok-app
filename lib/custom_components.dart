@@ -167,21 +167,30 @@ class _NoteListState extends State<NoteList> {
           return noteListItem(item.note, index, widget.dispatch);
         }
         if (item is NoteListItemLoadMoreTrigger) {
-          return ListTile(
-            title: NoteListItemLoadMore(dispatch: widget.dispatch),
-          );
+          return NoteListItemLoadMore(dispatch: widget.dispatch);
         }
         if (item is NoteListItemLoadingMore) {
-          return ListTile(title: noteListItemLoadingMore());
+          return noteListItemLoadingMore();
         }
         if (item is NoteListItemRetryLoadMore) {
-          return ListTile(
-            title: noteListItemRetryLoadMore(
-              item.filesToLoad,
-              item.filesToPreload,
-              item.reason,
-              widget.dispatch,
-            ),
+          return noteListItemRetryLoadMore(
+            item.filesToLoad,
+            item.filesToPreload,
+            item.reason,
+            widget.dispatch,
+          );
+        }
+        if (item is NoteListItemDeletingNote) {
+          return noteListItemDeletingNote();
+        }
+        if (item is NoteListItemDeletedNote) {
+          return noteListItemDeletedNote(item.note, widget.dispatch);
+        }
+        if (item is NoteListItemRetryDeletingNote) {
+          return noteListItemRetryDeletingNote(
+            item.note,
+            item.reason,
+            widget.dispatch,
           );
         }
 

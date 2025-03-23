@@ -347,3 +347,32 @@ class DeletingAccountFailed implements Message {
 
 @immutable
 class AccountDeletionRetryRequested implements Message {}
+
+@immutable
+class NoteListViewDeleteNoteRequested implements Message {
+  final Note note;
+
+  const NoteListViewDeleteNoteRequested(this.note);
+}
+
+@immutable
+class NoteListViewRetryDeletingNoteRequested implements Message {
+  final Note note;
+
+  const NoteListViewRetryDeletingNoteRequested(this.note);
+}
+
+@immutable
+class NoteListViewNoteDeleted implements Message {
+  final Note note;
+
+  const NoteListViewNoteDeleted(this.note);
+}
+
+@immutable
+class NoteListViewDeletingNoteFailed implements Message {
+  final Note note;
+  final String reason;
+
+  const NoteListViewDeletingNoteFailed(this.note, this.reason);
+}

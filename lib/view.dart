@@ -20,6 +20,8 @@ const navigationNoteList = 0;
 const navigationSettings = 1;
 const navigationSignOut = 2;
 
+const listItemHeight = 176.0;
+
 Widget home(
   BuildContext context,
   Model model,
@@ -372,6 +374,8 @@ Widget noteListView(
   );
 }
 
+enum NoteListItemContextAction { delete, restore }
+
 Widget noteListItem(Note note, int noteIdx, void Function(Message) dispatch) {
   return GestureDetector(
     behavior: HitTestBehavior.translucent,
@@ -379,21 +383,48 @@ Widget noteListItem(Note note, int noteIdx, void Function(Message) dispatch) {
       dispatch(NoteListViewMoveToPageView(note, noteIdx));
     },
     child: SizedBox(
-      height: 176,
+      height: listItemHeight,
       child: Column(
         children: [
-          Padding(
-            padding: EdgeInsets.only(top: 16, bottom: 16, left: 16, right: 16),
-            child: Align(
-              alignment: Alignment.topLeft,
-              child: Text(
-                note.title,
-                style: GoogleFonts.openSans(
-                  fontSize: textFontSize,
-                  fontWeight: FontWeight.w600,
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    top: 16,
+                    bottom: 16,
+                    left: 16,
+                    right: 16,
+                  ),
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      note.title,
+                      style: GoogleFonts.openSans(
+                        fontSize: textFontSize,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
+              PopupMenuButton(
+                iconColor: Colors.grey,
+                iconSize: textFontSize,
+                onSelected: (action) {
+                  if (action == NoteListItemContextAction.delete) {
+                    dispatch(NoteListViewDeleteNoteRequested(note));
+                  }
+                },
+                itemBuilder:
+                    (context) => [
+                      const PopupMenuItem<NoteListItemContextAction>(
+                        value: NoteListItemContextAction.delete,
+                        child: Text('Delete'),
+                      ),
+                    ],
+              ),
+            ],
           ),
           Expanded(
             // TODO: can this show links? Should it?
@@ -424,6 +455,109 @@ Widget noteListItemLoadingMore() {
         ),
       ),
     ],
+  );
+}
+
+Widget noteListItemDeletingNote() {
+  return SizedBox(height: listItemHeight / 2, child: spinner());
+}
+
+Widget noteListItemDeletedNote(Note note, void Function(Message) dispatch) {
+  return SizedBox(
+    height: listItemHeight / 2,
+    child: Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  top: 16,
+                  bottom: 16,
+                  left: 16,
+                  right: 16,
+                ),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    note.title,
+                    style: GoogleFonts.openSans(
+                      color: Colors.grey,
+                      fontSize: textFontSize,
+                      fontWeight: FontWeight.w600,
+                      textStyle: TextStyle(
+                        decoration: TextDecoration.lineThrough,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            PopupMenuButton(
+              iconColor: Colors.grey,
+              iconSize: textFontSize,
+              onSelected: (action) {
+                if (action == NoteListItemContextAction.restore) {
+                  //dispatch(NoteListViewDeleteNoteRequested(note, noteIdx));
+                }
+              },
+              itemBuilder:
+                  (context) => [
+                    const PopupMenuItem<NoteListItemContextAction>(
+                      value: NoteListItemContextAction.restore,
+                      child: Text('Restore'),
+                    ),
+                  ],
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
+Widget noteListItemRetryDeletingNote(
+  Note note,
+  String reason,
+  void Function(Message) dispatch,
+) {
+  return GestureDetector(
+    behavior: HitTestBehavior.translucent,
+    onTap: () {
+      dispatch(NoteListViewRetryDeletingNoteRequested(note));
+    },
+    child: Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(textPadding),
+          child: Text(
+            "Failed to delete note: $reason",
+            style: const TextStyle(fontSize: textFontSize, color: Colors.red),
+          ),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Text(
+                    "Click to re-try",
+                    style: GoogleFonts.openSans(
+                      textStyle: const TextStyle(
+                        fontSize: textFontSize,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
   );
 }
 

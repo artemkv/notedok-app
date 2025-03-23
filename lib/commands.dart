@@ -595,3 +595,23 @@ class DeleteAccount implements Command {
     }
   }
 }
+
+@immutable
+class DeleteNote implements Command {
+  final Note note;
+
+  const DeleteNote(this.note);
+
+  @override
+  void execute(void Function(Message) dispatch) async {
+    Future.delayed(Duration(seconds: 1), () {
+      /*dispatch(
+        NoteListViewDeletingNoteFailed(
+          note,
+          "Failed",
+        ),
+      );*/
+      dispatch(NoteListViewNoteDeleted(note));
+    });
+  }
+}
