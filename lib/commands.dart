@@ -12,11 +12,13 @@ import 'package:notedok/services/session_api.dart';
 
 // This is the only place where side-effects are allowed!
 
+// Caches...
+// Good for user experience, very bad for subtle bugs
 Preloader preloader = Preloader();
-
 GetFilesCachedResult? getFilesCachedResult;
 
 clearAllCaches() {
+  preloader.clean();
   getFilesCachedResult = null;
 }
 
@@ -303,13 +305,14 @@ class PreloadNoteContent implements Command {
 }
 
 @immutable
-class InvalidatePreloadedContent implements Command {
+class InvalidateFileCaches implements Command {
   final String fileName;
 
-  const InvalidatePreloadedContent(this.fileName);
+  const InvalidateFileCaches(this.fileName);
 
   @override
   void execute(void Function(Message) dispatch) async {
+    getFilesCachedResult = null;
     preloader.dropPreload(fileName);
   }
 }

@@ -223,7 +223,10 @@ ModelAndCommand reduce(Model model, Message message) {
           model.unprocessedFiles,
           updatedItems,
         ),
-        DeleteNote(message.note),
+        CommandList([
+          InvalidateFileCaches(message.note.fileName),
+          DeleteNote(message.note),
+        ]),
       );
     }
   }
@@ -242,6 +245,7 @@ ModelAndCommand reduce(Model model, Message message) {
       return ModelAndCommand.justModel(
         NoteListViewModel(
           model.searchString,
+          // TODO: at this point, we have a filename for a note that has been deleted here
           model.files,
           model.unprocessedFiles,
           updatedItems,
@@ -509,6 +513,8 @@ ModelAndCommand reduce(Model model, Message message) {
     if (model is NotePageViewModel) {
       return ModelAndCommand(
         RetrievingFileListModel(model.searchString),
+        // Tricky point here. Changes might have happened in between
+        // Make sure all the invalidations happen
         RetrieveFileList(model.searchString, false),
       );
     }
@@ -656,7 +662,7 @@ ModelAndCommand reduce(Model model, Message message) {
       return ModelAndCommand(
         SavingNoteModel(model.pageViewSavedState),
         CommandList([
-          InvalidatePreloadedContent(model.fileName),
+          InvalidateFileCaches(model.fileName),
           SaveNote(
             model.fileName,
             message.title,
