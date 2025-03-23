@@ -604,15 +604,18 @@ class DeleteNote implements Command {
 
   @override
   void execute(void Function(Message) dispatch) async {
-    Future.delayed(Duration(seconds: 1), () {
-      /*dispatch(
-        NoteListViewDeletingNoteFailed(
-          note,
-          "Failed",
-        ),
-      );*/
-      dispatch(NoteListViewNoteDeleted(note));
-    });
+    try {
+      final session =
+          await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+      if (session.isSignedIn) {
+        var idToken = session.userPoolTokensResult.value.idToken;
+
+        await deleteFile(note.fileName, () => Future.value(idToken.raw));
+        dispatch(NoteListViewNoteDeleted(note));
+      }
+    } catch (err) {
+      dispatch(NoteListViewDeletingNoteFailed(note, err.toString()));
+    }
   }
 }
 
@@ -624,14 +627,83 @@ class RestoreNote implements Command {
 
   @override
   void execute(void Function(Message) dispatch) async {
-    Future.delayed(Duration(seconds: 1), () {
-      /*dispatch(
-        NoteListViewRestoringNoteFailed(
-          note,
-          "Failed to restore " + note.title,
-        ),
-      );*/
-      dispatch(NoteListViewNoteRestored(note));
-    });
+    try {
+      final session =
+          await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+      if (session.isSignedIn) {
+        var idToken = session.userPoolTokensResult.value.idToken;
+
+        try {
+          // Try to restore with exactly the same path as before, don't overwrite
+          await postFile(
+            note.fileName,
+            note.text,
+            () => Future.value(idToken.raw),
+          );
+        } catch (err) {
+          if (err is RestApiException && err.statusCode == 409) {
+            var isMarkdown = isMarkdownFile(note.fileName);
+
+            // The path that suddenly is taken (almost unrealistic)
+            // Regenerate path from title, this time enfocing uniqueness
+            String newPath =
+                isMarkdown
+                    ? generatePathFromTitleMd(note.fileName, true)
+                    : generatePathFromTitleText(note.fileName, true);
+            try {
+              await putFile(
+                newPath,
+                note.text,
+                () => Future.value(idToken.raw),
+              );
+              dispatch(NoteListViewNoteRestoredOnNewPath(note, newPath));
+              return;
+            } catch (err) {
+              dispatch(
+                NoteListViewRestoringNoteOnNewPathFailed(
+                  note,
+                  newPath,
+                  err.toString(),
+                ),
+              );
+              return;
+            }
+          } else {
+            dispatch(NoteListViewRestoringNoteFailed(note, err.toString()));
+            return;
+          }
+        }
+
+        dispatch(NoteListViewNoteRestored(note));
+      }
+    } catch (err) {
+      dispatch(NoteListViewRestoringNoteFailed(note, err.toString()));
+    }
+  }
+}
+
+@immutable
+class RestoreNoteWithOnNewPath implements Command {
+  final Note note;
+  final String newPath;
+
+  const RestoreNoteWithOnNewPath(this.note, this.newPath);
+
+  @override
+  void execute(void Function(Message) dispatch) async {
+    try {
+      final session =
+          await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+      if (session.isSignedIn) {
+        var idToken = session.userPoolTokensResult.value.idToken;
+
+        await putFile(newPath, note.text, () => Future.value(idToken.raw));
+        dispatch(NoteListViewNoteRestoredOnNewPath(note, newPath));
+      }
+    } catch (err) {
+      dispatch(
+        NoteListViewRestoringNoteOnNewPathFailed(note, newPath, err.toString()),
+      );
+    }
   }
 }

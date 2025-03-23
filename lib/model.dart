@@ -207,6 +207,44 @@ class NoteListItemRetryRestoringNote extends NoteListItem {
 }
 
 @immutable
+class NoteListItemRestoringNoteOnNewPath extends NoteListItem {
+  final Note note;
+  final String newFileName;
+
+  const NoteListItemRestoringNoteOnNewPath(this.note, this.newFileName);
+
+  @override
+  bool operator ==(Object other) {
+    return other is NoteListItemRestoringNoteOnNewPath && note == other.note;
+  }
+
+  @override
+  int get hashCode => note.hashCode;
+}
+
+@immutable
+class NoteListItemRetryRestoringNoteOnNewPath extends NoteListItem {
+  final Note note;
+  final String newFileName;
+  final String reason;
+
+  const NoteListItemRetryRestoringNoteOnNewPath(
+    this.note,
+    this.newFileName,
+    this.reason,
+  );
+
+  @override
+  bool operator ==(Object other) {
+    return other is NoteListItemRetryRestoringNoteOnNewPath &&
+        note == other.note;
+  }
+
+  @override
+  int get hashCode => note.hashCode;
+}
+
+@immutable
 class NoteListItemLoadMoreTrigger extends NoteListItem {
   @override
   bool operator ==(Object other) {

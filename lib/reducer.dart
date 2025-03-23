@@ -343,6 +343,45 @@ ModelAndCommand reduce(Model model, Message message) {
       );
     }
   }
+  if (message is NoteListViewNoteRestoredOnNewPath) {
+    if (model is NoteListViewModel) {
+      var updatedItems =
+          model.items.map((listItem) {
+            if (listItem is NoteListItemRestoringNote) {
+              if (listItem.note == message.note) {
+                return NoteListItemNote(
+                  Note(
+                    message.newFileName,
+                    message.note.title,
+                    message.note.text,
+                  ),
+                );
+              }
+            }
+            if (listItem is NoteListItemRestoringNoteOnNewPath) {
+              if (listItem.note == message.note) {
+                return NoteListItemNote(
+                  Note(
+                    message.newFileName,
+                    message.note.title,
+                    message.note.text,
+                  ),
+                );
+              }
+            }
+            return listItem;
+          }).toList();
+
+      return ModelAndCommand.justModel(
+        NoteListViewModel(
+          model.searchString,
+          model.files,
+          model.unprocessedFiles,
+          updatedItems,
+        ),
+      );
+    }
+  }
   if (message is NoteListViewRestoringNoteFailed) {
     if (model is NoteListViewModel) {
       var updatedItems =
@@ -388,6 +427,67 @@ ModelAndCommand reduce(Model model, Message message) {
           updatedItems,
         ),
         RestoreNote(message.note),
+      );
+    }
+  }
+  if (message is NoteListViewRestoringNoteOnNewPathFailed) {
+    if (model is NoteListViewModel) {
+      var updatedItems =
+          model.items.map((listItem) {
+            if (listItem is NoteListItemRestoringNote) {
+              if (listItem.note == message.note) {
+                return NoteListItemRetryRestoringNoteOnNewPath(
+                  message.note,
+                  message.newFileName,
+                  message.reason,
+                );
+              }
+            }
+            if (listItem is NoteListItemRestoringNoteOnNewPath) {
+              if (listItem.note == message.note) {
+                return NoteListItemRetryRestoringNoteOnNewPath(
+                  message.note,
+                  message.newFileName,
+                  message.reason,
+                );
+              }
+            }
+            return listItem;
+          }).toList();
+
+      return ModelAndCommand.justModel(
+        NoteListViewModel(
+          model.searchString,
+          model.files,
+          model.unprocessedFiles,
+          updatedItems,
+        ),
+      );
+    }
+  }
+  if (message is NoteListViewRetryRestoringNoteOnNewPathRequested) {
+    if (model is NoteListViewModel) {
+      var updatedItems =
+          model.items.map((listItem) {
+            if (listItem is NoteListItemRetryRestoringNoteOnNewPath) {
+              if (listItem.note == message.note) {
+                return NoteListItemRestoringNoteOnNewPath(
+                  message.note,
+                  message.newFileName,
+                );
+              }
+            }
+            return listItem;
+          }).toList();
+
+      return ModelAndCommand(
+        NoteListViewModel(
+          model.searchString,
+          model.files,
+          model.unprocessedFiles,
+          updatedItems,
+        ),
+        RestoreNoteWithOnNewPath(message.note, message.newFileName),
       );
     }
   }

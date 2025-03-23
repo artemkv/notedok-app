@@ -565,6 +565,10 @@ Widget noteListItemRestoringNote() {
   return SizedBox(height: listItemHeight / 2, child: spinner());
 }
 
+Widget noteListItemRestoringNoteOnNewPath() {
+  return SizedBox(height: listItemHeight / 2, child: spinner());
+}
+
 Widget noteListItemRetryRestoringNote(
   Note note,
   String reason,
@@ -574,6 +578,54 @@ Widget noteListItemRetryRestoringNote(
     behavior: HitTestBehavior.translucent,
     onTap: () {
       dispatch(NoteListViewRetryRestoringNoteRequested(note));
+    },
+    child: Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(textPadding),
+          child: Text(
+            "Failed to restore note: $reason",
+            style: const TextStyle(fontSize: textFontSize, color: Colors.red),
+          ),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Text(
+                    "Click to re-try",
+                    style: GoogleFonts.openSans(
+                      textStyle: const TextStyle(
+                        fontSize: textFontSize,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
+Widget noteListItemRetryRestoringNoteOnNewPath(
+  Note note,
+  String newFileName,
+  String reason,
+  void Function(Message) dispatch,
+) {
+  return GestureDetector(
+    behavior: HitTestBehavior.translucent,
+    onTap: () {
+      dispatch(
+        NoteListViewRetryRestoringNoteOnNewPathRequested(note, newFileName),
+      );
     },
     child: Column(
       children: [

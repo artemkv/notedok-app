@@ -385,17 +385,18 @@ class NoteListViewRestoreNoteRequested implements Message {
 }
 
 @immutable
-class NoteListViewRetryRestoringNoteRequested implements Message {
-  final Note note;
-
-  const NoteListViewRetryRestoringNoteRequested(this.note);
-}
-
-@immutable
 class NoteListViewNoteRestored implements Message {
   final Note note;
 
   const NoteListViewNoteRestored(this.note);
+}
+
+@immutable
+class NoteListViewNoteRestoredOnNewPath implements Message {
+  final Note note;
+  final String newFileName;
+
+  const NoteListViewNoteRestoredOnNewPath(this.note, this.newFileName);
 }
 
 @immutable
@@ -404,4 +405,35 @@ class NoteListViewRestoringNoteFailed implements Message {
   final String reason;
 
   const NoteListViewRestoringNoteFailed(this.note, this.reason);
+}
+
+@immutable
+class NoteListViewRetryRestoringNoteRequested implements Message {
+  final Note note;
+
+  const NoteListViewRetryRestoringNoteRequested(this.note);
+}
+
+@immutable
+class NoteListViewRestoringNoteOnNewPathFailed implements Message {
+  final Note note;
+  final String newFileName;
+  final String reason;
+
+  const NoteListViewRestoringNoteOnNewPathFailed(
+    this.note,
+    this.newFileName,
+    this.reason,
+  );
+}
+
+@immutable
+class NoteListViewRetryRestoringNoteOnNewPathRequested implements Message {
+  final Note note;
+  final String newFileName;
+
+  const NoteListViewRetryRestoringNoteOnNewPathRequested(
+    this.note,
+    this.newFileName,
+  );
 }

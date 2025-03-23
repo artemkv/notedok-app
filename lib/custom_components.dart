@@ -203,6 +203,17 @@ class _NoteListState extends State<NoteList> {
             widget.dispatch,
           );
         }
+        if (item is NoteListItemRestoringNoteOnNewPath) {
+          return noteListItemRestoringNoteOnNewPath();
+        }
+        if (item is NoteListItemRetryRestoringNoteOnNewPath) {
+          return noteListItemRetryRestoringNoteOnNewPath(
+            item.note,
+            item.newFileName,
+            item.reason,
+            widget.dispatch,
+          );
+        }
 
         throw "Unknown type of NoteListItem";
       },
