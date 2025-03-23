@@ -350,16 +350,23 @@ Widget noteListView(
       child:
           model.files.isNotEmpty
               ? NoteList(model: model, dispatch: dispatch)
-              : Center(
-                child: Text(
-                  "Nothing found",
-                  style: GoogleFonts.openSans(
-                    textStyle: const TextStyle(
-                      fontSize: textFontSize,
-                      color: Colors.grey,
+              // https://blog.okaryo.studio/en/20241005-flutter-non-scroll-widget-refresh-indicator/
+              : CustomScrollView(
+                slivers: [
+                  SliverFillRemaining(
+                    child: Center(
+                      child: Text(
+                        "Nothing found",
+                        style: GoogleFonts.openSans(
+                          textStyle: const TextStyle(
+                            fontSize: textFontSize,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
     ),
     backgroundColor: Colors.white,
