@@ -26,7 +26,7 @@ ModelAndCommand reduce(Model model, Message message) {
   if (message is SearchSubmitted) {
     return ModelAndCommand(
       RetrievingFileListModel(message.searchString),
-      RetrieveFileList(message.searchString, false),
+      RetrieveFileList(message.searchString, true),
     );
   }
 
@@ -513,8 +513,10 @@ ModelAndCommand reduce(Model model, Message message) {
     if (model is NotePageViewModel) {
       return ModelAndCommand(
         RetrievingFileListModel(model.searchString),
-        // Tricky point here. Changes might have happened in between
-        // Make sure all the invalidations happen
+        // This is the only place we want to try to save some time on avoiding reloading files
+        // It's tricky, as changes might have happened in between
+        // To avoid bugs, we need to make sure all the invalidations happen
+        // TODO: So I actually not convinced it's all worth it
         RetrieveFileList(model.searchString, false),
       );
     }
@@ -793,7 +795,7 @@ ModelAndCommand reduce(Model model, Message message) {
   if (message is CancelEditingAppSettingsRequested) {
     return ModelAndCommand(
       RetrievingFileListModel(""),
-      RetrieveFileList("", false),
+      RetrieveFileList("", true),
     );
   }
   if (message is AccountDeletionRequested) {
@@ -802,7 +804,7 @@ ModelAndCommand reduce(Model model, Message message) {
   if (message is AccountDeletionCanceled) {
     return ModelAndCommand(
       RetrievingFileListModel(""),
-      RetrieveFileList("", false),
+      RetrieveFileList("", true),
     );
   }
   if (message is AccountDeletionConfirmed) {
